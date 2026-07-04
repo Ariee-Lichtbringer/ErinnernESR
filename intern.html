@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interner Schülerbereich | Erinnern ESR</title>
+  <meta name="description" content="Interner Bereich für angemeldete Schülerinnen und Schüler der Straßburgfahrt 2026.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="internal-page">
+  <header class="internal-hero">
+    <nav class="topbar" aria-label="Interne Navigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">ES</span>
+        <span>Erinnern ESR</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Startseite</a>
+        <a href="#aufgaben">Aufgaben</a>
+        <a href="#journal">Journal</a>
+        <a href="#material">Material</a>
+      </div>
+    </nav>
+
+    <div class="internal-hero-content">
+      <p class="eyebrow">Interner Bereich</p>
+      <h1>Straßburgfahrt 2026</h1>
+      <p class="hero-copy">Persönliche Übersicht, Vorbereitung, Aufgaben und Reisejournal.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="section internal-locked" id="lockedPanel">
+      <div class="section-heading">
+        <p class="eyebrow">Anmeldung erforderlich</p>
+        <h2>Bitte zuerst einloggen</h2>
+        <p>Der interne Bereich wird angezeigt, sobald du auf der Startseite einen Zugang angelegt und dich angemeldet hast.</p>
+      </div>
+      <a class="button primary" href="index.html#schuelerbereich">Zum Schüler-Login</a>
+    </section>
+
+    <section class="section internal-dashboard hidden" id="dashboardPanel">
+      <div class="section-heading">
+        <p class="eyebrow">Angemeldet</p>
+        <h2 id="studentGreeting">Willkommen</h2>
+        <p id="studentMeta"></p>
+      </div>
+
+      <div class="dashboard-grid">
+        <article class="dashboard-card">
+          <span class="label">Reisezeitraum</span>
+          <h3>09.-13. November 2026</h3>
+          <p>Abfahrt Montag, 09.11.2026, um 07:25 Uhr an der Europaschule Rheinberg.</p>
+        </article>
+        <article class="dashboard-card">
+          <span class="label">Rückfahrt</span>
+          <h3>Freitag, 02:06 Uhr</h3>
+          <p>Nachtfahrt ab Straßburg Gare Centrale zurück nach Rheinberg.</p>
+        </article>
+        <article class="dashboard-card">
+          <span class="label">Nicht vergessen</span>
+          <h3>Personalausweis</h3>
+          <p>Der Ausweis muss zur Abfahrt mitgeführt werden.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section internal-section hidden" id="aufgaben">
+      <div class="section-heading">
+        <p class="eyebrow">Vorbereitung</p>
+        <h2>Meine Aufgaben</h2>
+      </div>
+      <div class="task-list" id="taskList"></div>
+    </section>
+
+    <section class="section internal-section hidden" id="journal">
+      <div class="section-heading">
+        <p class="eyebrow">Reisejournal</p>
+        <h2>Notizen und Reflexion</h2>
+        <p>Die Einträge bleiben in diesem Browser gespeichert und können vor Ort weitergeführt werden.</p>
+      </div>
+      <form class="journal-form" id="journalForm">
+        <label>
+          Erwartung oder Frage an die Fahrt
+          <textarea name="beforeTrip" rows="4"></textarea>
+        </label>
+        <label>
+          Eindrücke und Gedanken
+          <textarea name="reflection" rows="6"></textarea>
+        </label>
+        <button class="button primary" type="submit">Journal speichern</button>
+      </form>
+      <p class="auth-message" id="journalMessage" aria-live="polite"></p>
+    </section>
+
+    <section class="section internal-section hidden" id="material">
+      <div class="section-heading">
+        <p class="eyebrow">Material</p>
+        <h2>Für die Fahrt</h2>
+      </div>
+      <div class="material-grid">
+        <article>
+          <h3>Tagesrucksack</h3>
+          <p>Ausweis, Trinkflasche, Schreibzeug, Reisejournal und wetterfeste Kleidung einpacken.</p>
+        </article>
+        <article>
+          <h3>Verhalten an Lernorten</h3>
+          <p>Rücksichtsvoll bewegen, aufmerksam zuhören, fotografische Regeln beachten und Fragen sammeln.</p>
+        </article>
+        <article>
+          <h3>Nachbereitung</h3>
+          <p>Fotos, Notizen und Ergebnisse werden später für die Ausstellung Straßburg 2026 genutzt.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Europaschule | Interner Schülerbereich</p>
+    <button class="button compact" type="button" id="internalLogout">Abmelden</button>
+  </footer>
+
+  <script src="intern.js"></script>
+</body>
+</html>

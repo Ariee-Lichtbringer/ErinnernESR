@@ -43,6 +43,26 @@ a {
   color: var(--white);
 }
 
+.internal-page {
+  background: #f4f1eb;
+}
+
+.internal-hero {
+  min-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background:
+    linear-gradient(90deg, rgba(23, 33, 31, .82), rgba(23, 33, 31, .42)),
+    url("assets/images/gedenkstaettenfahrt-hero.png") center / cover no-repeat;
+  color: var(--white);
+}
+
+.internal-hero-content {
+  width: min(760px, calc(100% - 36px));
+  margin: auto 0 8vh clamp(18px, 6vw, 86px);
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -224,7 +244,9 @@ h3 {
 .payment-grid,
 .archive-grid,
 .trip-grid,
-.program-grid {
+.program-grid,
+.dashboard-grid,
+.material-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
@@ -237,7 +259,9 @@ h3 {
 .trip-card,
 .program-grid article,
 .auth-card,
-.auth-status {
+.auth-status,
+.dashboard-card,
+.material-grid article {
   border: 1px solid var(--line);
   background: var(--white);
   padding: 24px;
@@ -250,6 +274,8 @@ h3 {
 .trip-grid > *,
 .program-grid > *,
 .auth-grid > *,
+.dashboard-grid > *,
+.material-grid > *,
 .split > *,
 .signup-form > * {
   min-width: 0;
@@ -261,9 +287,64 @@ h3 {
 .video-placeholder p,
 .trip-card p,
 .program-grid p,
-.auth-status p {
+.auth-status p,
+.dashboard-card p,
+.material-grid p {
   color: var(--muted);
   overflow-wrap: anywhere;
+}
+
+.dashboard-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.internal-dashboard {
+  background: var(--band);
+}
+
+.internal-section {
+  background: var(--paper);
+}
+
+.internal-section:nth-of-type(odd) {
+  background: #f4f1eb;
+}
+
+.internal-locked {
+  background: var(--band);
+  min-height: 45vh;
+}
+
+.task-list {
+  display: grid;
+  gap: 10px;
+}
+
+.task-item {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  font-size: 16px;
+  box-shadow: var(--shadow);
+}
+
+.task-item input {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+}
+
+.journal-form {
+  display: grid;
+  gap: 14px;
+  max-width: 880px;
+}
+
+.material-grid {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .trip-section {
@@ -601,6 +682,8 @@ footer p {
   .trip-grid,
   .program-grid,
   .auth-grid,
+  .dashboard-grid,
+  .material-grid,
   .split,
   .signup-form {
     grid-template-columns: 1fr;

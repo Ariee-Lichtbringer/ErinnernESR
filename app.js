@@ -66,6 +66,7 @@ function renderAuth(message = "") {
   authStatus.innerHTML = `
     <strong>Angemeldet</strong>
     <p>${escapeHtml(activeStudent.name)}<br>${escapeHtml(activeStudent.className)} | ${escapeHtml(activeStudent.email)}</p>
+    <a class="button primary" href="intern.html">Interner Bereich</a>
     <a class="button primary" href="#anmeldung">Zur Vormerkung</a>
     <button class="button compact" type="button" id="logoutButton">Abmelden</button>
     ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
