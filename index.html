@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gedenkstättenfahrten | Europaschule</title>
+  <meta name="description" content="Organisation der Gedenkstättenfahrten: Anmeldung, Ablauf, Zahlungen, Elternbriefe und Archiv.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero" id="start">
+    <nav class="topbar" aria-label="Hauptnavigation">
+      <a class="brand" href="#start" aria-label="Startseite">
+        <span class="brand-mark" aria-hidden="true">ES</span>
+        <span>Erinnern ESR</span>
+      </a>
+      <div class="nav-links">
+        <a href="#anmeldung">Anmeldung</a>
+        <a href="#ablauf">Ablauf</a>
+        <a href="#zahlungen">Zahlungen</a>
+        <a href="#downloads">Elternbriefe</a>
+        <a href="#archiv">Archiv</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <p class="eyebrow">Europaschule</p>
+      <h1>Gedenkstättenfahrten</h1>
+      <p class="hero-copy">Informationen, Anmeldungen, Elternbriefe, Zahlungen und Rückblicke an einem Ort.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#anmeldung">Anmeldung erfassen</a>
+        <a class="button secondary" href="#downloads">Elternbrief laden</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="status-band" aria-label="Aktueller Stand">
+      <div>
+        <span class="label">Nächste Fahrt</span>
+        <strong>Frühjahr 2027</strong>
+      </div>
+      <div>
+        <span class="label">Anmeldeschluss</span>
+        <strong>15. Dezember 2026</strong>
+      </div>
+      <div>
+        <span class="label">Teilzahlung</span>
+        <strong>bis 31. Januar 2027</strong>
+      </div>
+      <div>
+        <span class="label">Kontakt</span>
+        <strong>gedenkfahrt@europaschule.example</strong>
+      </div>
+    </section>
+
+    <section class="section intro">
+      <div class="section-heading">
+        <p class="eyebrow">Organisation</p>
+        <h2>Alles Wichtige für Eltern, Schülerinnen und Schüler</h2>
+      </div>
+      <div class="feature-grid">
+        <article>
+          <h3>Anmeldungen</h3>
+          <p>Teilnahmewunsch, Kontaktdaten, Notfallnummer und Hinweise werden strukturiert erfasst.</p>
+        </article>
+        <article>
+          <h3>Ablauf</h3>
+          <p>Vorbereitung, Reisetage, Begleitprogramm und Nachbereitung sind transparent abgebildet.</p>
+        </article>
+        <article>
+          <h3>Zahlungen</h3>
+          <p>Raten, Fristen und Zahlungsstatus können für die Fahrt übersichtlich koordiniert werden.</p>
+        </article>
+        <article>
+          <h3>Archiv</h3>
+          <p>Vergangene Fahrten können mit Fotos, Videos und kurzen Rückblicken dokumentiert werden.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section split" id="anmeldung">
+      <div class="section-heading">
+        <p class="eyebrow">Anmeldung</p>
+        <h2>Teilnahme vormerken</h2>
+        <p>Diese erste Version speichert Eingaben lokal im Browser. Für echte Anmeldungen sollte später ein geschütztes Formular oder Schul-Backend angebunden werden.</p>
+      </div>
+
+      <form class="signup-form" id="signupForm">
+        <label>
+          Name der Schülerin / des Schülers
+          <input name="student" autocomplete="name" required>
+        </label>
+        <label>
+          Klasse / Jahrgang
+          <input name="className" placeholder="z. B. 10b" required>
+        </label>
+        <label>
+          Erziehungsberechtigte Person
+          <input name="guardian" autocomplete="name" required>
+        </label>
+        <label>
+          E-Mail
+          <input type="email" name="email" autocomplete="email" required>
+        </label>
+        <label>
+          Telefon für Rückfragen
+          <input name="phone" autocomplete="tel">
+        </label>
+        <label>
+          Fahrt
+          <select name="trip">
+            <option>Gedenkstättenfahrt 2027</option>
+            <option>Vorbereitungstreffen</option>
+            <option>Interessenliste kommende Fahrt</option>
+          </select>
+        </label>
+        <label class="full">
+          Hinweise zu Gesundheit, Verpflegung oder Unterstützungsbedarf
+          <textarea name="notes" rows="4"></textarea>
+        </label>
+        <label class="check full">
+          <input type="checkbox" name="consent" required>
+          <span>Ich habe zur Kenntnis genommen, dass dies eine Vormerkung ist und die verbindlichen Unterlagen über die Schule folgen.</span>
+        </label>
+        <button class="button primary" type="submit">Vormerkung speichern</button>
+      </form>
+
+      <aside class="admin-panel" aria-label="Gespeicherte Vormerkungen">
+        <div class="panel-head">
+          <h3>Vormerkungen</h3>
+          <button class="button compact" id="exportCsv" type="button">CSV exportieren</button>
+        </div>
+        <div class="signup-list" id="signupList"></div>
+      </aside>
+    </section>
+
+    <section class="section" id="ablauf">
+      <div class="section-heading">
+        <p class="eyebrow">Ablauf</p>
+        <h2>Von der Vorbereitung bis zur Nachbereitung</h2>
+      </div>
+      <ol class="timeline">
+        <li>
+          <span>1</span>
+          <div>
+            <h3>Information und Elternbrief</h3>
+            <p>Termin, Ziel, Kostenrahmen, pädagogisches Konzept und Einverständniserklärung werden bereitgestellt.</p>
+          </div>
+        </li>
+        <li>
+          <span>2</span>
+          <div>
+            <h3>Anmeldung und Rückmeldung</h3>
+            <p>Die Schule sammelt Teilnahmewünsche, prüft Plätze und bestätigt die verbindliche Teilnahme.</p>
+          </div>
+        </li>
+        <li>
+          <span>3</span>
+          <div>
+            <h3>Vorbereitung im Unterricht</h3>
+            <p>Historischer Kontext, Biografien, Besuchsregeln und Fragen der Erinnerungskultur werden vorbereitet.</p>
+          </div>
+        </li>
+        <li>
+          <span>4</span>
+          <div>
+            <h3>Fahrt und Begleitung</h3>
+            <p>Die Reise wird durch Lehrkräfte begleitet. Zeiten, Treffpunkte und Notfallkontakte stehen im Elternbrief.</p>
+          </div>
+        </li>
+        <li>
+          <span>5</span>
+          <div>
+            <h3>Reflexion und Dokumentation</h3>
+            <p>Eindrücke werden in der Schule nachbereitet und für den Archivbereich kuratiert.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section payment-section" id="zahlungen">
+      <div class="section-heading">
+        <p class="eyebrow">Zahlungen</p>
+        <h2>Raten und Fristen</h2>
+      </div>
+      <div class="payment-grid">
+        <article class="payment-card">
+          <span class="amount">50 EUR</span>
+          <h3>Anzahlung</h3>
+          <p>fällig nach Teilnahmebestätigung</p>
+        </article>
+        <article class="payment-card">
+          <span class="amount">120 EUR</span>
+          <h3>Teilzahlung</h3>
+          <p>fällig bis 31. Januar 2027</p>
+        </article>
+        <article class="payment-card">
+          <span class="amount">Restbetrag</span>
+          <h3>Abschlusszahlung</h3>
+          <p>fällig nach finaler Kostenabrechnung</p>
+        </article>
+      </div>
+      <div class="notice">
+        <strong>Hinweis:</strong> Kontodaten, Fördermöglichkeiten und verbindliche Beträge sollten erst nach schulischer Freigabe hier eingetragen werden.
+      </div>
+    </section>
+
+    <section class="section downloads" id="downloads">
+      <div class="section-heading">
+        <p class="eyebrow">Downloads</p>
+        <h2>Elternbriefe und Formulare</h2>
+      </div>
+      <div class="download-list">
+        <a href="assets/elternbriefe/elternbrief-gedenkstaettenfahrt-2027.pdf" download>
+          <span>Elternbrief Gedenkstättenfahrt 2027</span>
+          <small>PDF hinterlegen unter assets/elternbriefe/</small>
+        </a>
+        <a href="assets/elternbriefe/einverstaendniserklaerung.pdf" download>
+          <span>Einverständniserklärung</span>
+          <small>PDF hinterlegen unter assets/elternbriefe/</small>
+        </a>
+        <a href="assets/elternbriefe/packliste-und-ablauf.pdf" download>
+          <span>Packliste und Ablaufplan</span>
+          <small>PDF hinterlegen unter assets/elternbriefe/</small>
+        </a>
+      </div>
+    </section>
+
+    <section class="section archive" id="archiv">
+      <div class="section-heading">
+        <p class="eyebrow">Rückblicke</p>
+        <h2>Vergangene Fahrten</h2>
+      </div>
+      <div class="archive-grid">
+        <article class="archive-item">
+          <img src="assets/images/gedenkstaettenfahrt-hero.png" alt="Reisevorbereitung auf dem Schulhof">
+          <div>
+            <h3>Fahrt 2025</h3>
+            <p>Rückblick, Bildergalerie und Video können hier ergänzt werden.</p>
+            <a class="text-link" href="assets/archiv/2025/">Archivordner öffnen</a>
+          </div>
+        </article>
+        <article class="video-placeholder">
+          <div class="play" aria-hidden="true"></div>
+          <h3>Video-Rückblick</h3>
+          <p>Videodateien können in assets/videos/ abgelegt und hier verlinkt werden.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Europaschule | Gedenkstättenfahrten</p>
+    <a href="#start">Nach oben</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
