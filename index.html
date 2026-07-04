@@ -15,6 +15,8 @@
         <span>Erinnern ESR</span>
       </a>
       <div class="nav-links">
+        <a href="#strassburg">Straßburg 2026</a>
+        <a href="#schuelerbereich">Schülerbereich</a>
         <a href="#anmeldung">Anmeldung</a>
         <a href="#ablauf">Ablauf</a>
         <a href="#zahlungen">Zahlungen</a>
@@ -28,7 +30,8 @@
       <h1>Gedenkstättenfahrten</h1>
       <p class="hero-copy">Informationen, Anmeldungen, Elternbriefe, Zahlungen und Rückblicke an einem Ort.</p>
       <div class="hero-actions">
-        <a class="button primary" href="#anmeldung">Anmeldung erfassen</a>
+        <a class="button primary" href="#schuelerbereich">Schüler-Login</a>
+        <a class="button secondary" href="#anmeldung">Anmeldung erfassen</a>
         <a class="button secondary" href="#downloads">Elternbrief laden</a>
       </div>
     </div>
@@ -38,19 +41,19 @@
     <section class="status-band" aria-label="Aktueller Stand">
       <div>
         <span class="label">Nächste Fahrt</span>
-        <strong>Frühjahr 2027</strong>
+        <strong>Straßburg, 09.-13.11.2026</strong>
       </div>
       <div>
-        <span class="label">Anmeldeschluss</span>
-        <strong>15. Dezember 2026</strong>
+        <span class="label">Jahrgänge</span>
+        <strong>8 und 9</strong>
       </div>
       <div>
-        <span class="label">Teilzahlung</span>
-        <strong>bis 31. Januar 2027</strong>
+        <span class="label">Eigenanteil</span>
+        <strong>250 EUR pro Person</strong>
       </div>
       <div>
         <span class="label">Kontakt</span>
-        <strong>gedenkfahrt@europaschule.example</strong>
+        <strong>Julia Sonnenwald</strong>
       </div>
     </section>
 
@@ -76,6 +79,113 @@
           <h3>Archiv</h3>
           <p>Vergangene Fahrten können mit Fotos, Videos und kurzen Rückblicken dokumentiert werden.</p>
         </article>
+      </div>
+    </section>
+
+    <section class="section trip-section" id="strassburg">
+      <div class="section-heading">
+        <p class="eyebrow">Straßburg 2026</p>
+        <h2>Gedenkstättenfahrt der Jahrgänge 8 und 9</h2>
+        <p>Die Fahrt verbindet historisches Lernen, europäische Demokratiebildung und persönliche Reflexion. Grundlage sind die Ablaufpläne und die aktualisierte Kostenübersicht vom 25.05.2026.</p>
+      </div>
+      <div class="trip-grid">
+        <article class="trip-card strong">
+          <span class="label">Reisezeitraum</span>
+          <h3>09. bis 13. November 2026</h3>
+          <p>Abfahrt an der Europaschule Rheinberg am Montag um 07:25 Uhr. Rückfahrt ab Straßburg Gare Centrale am Freitag um 02:06 Uhr.</p>
+        </article>
+        <article class="trip-card">
+          <span class="label">Teilnehmende</span>
+          <h3>ca. 50 Personen</h3>
+          <p>Geplant für Schülerinnen und Schüler aus Jahrgang 8 und Jahrgang 9 mit begleitenden Lehrkräften.</p>
+        </article>
+        <article class="trip-card">
+          <span class="label">Kostenrahmen</span>
+          <h3>250 EUR Eigenanteil</h3>
+          <p>Die Gesamtkalkulation liegt bei 16.233,16 EUR. Vorgesehen sind 12.500 EUR Eigenanteile und 4.000 EUR Förderung.</p>
+        </article>
+      </div>
+
+      <div class="program-grid">
+        <article>
+          <span>Mo.</span>
+          <h3>Anreise und Einstieg</h3>
+          <p>Busfahrt nach Straßburg, Orientierung im Hostel, Einführung in die historische Bedeutung der Region und erste Reflexionsrunde.</p>
+        </article>
+        <article>
+          <span>Di.</span>
+          <h3>Natzweiler-Struthof</h3>
+          <p>Geführter Rundgang, Museum, Biografiearbeit und schriftliche Verarbeitung des Besuchs im Reisejournal.</p>
+        </article>
+        <article>
+          <span>Mi.</span>
+          <h3>Europäisches Parlament</h3>
+          <p>Einführung in EU-Arbeitsprozesse, Planspiel zu Entscheidungswegen, Fragerunde und Stadterkundung in Kleingruppen.</p>
+        </article>
+        <article>
+          <span>Do.</span>
+          <h3>Musée Alsace</h3>
+          <p>Regionalgeschichte zwischen Deutschland und Frankreich, Themenhäuser, Zeitzeugenunterricht und Abschlussessen im Flammkuchenhaus.</p>
+        </article>
+        <article>
+          <span>Fr.</span>
+          <h3>Rückfahrt</h3>
+          <p>Nachtfahrt zurück nach Rheinberg, Ausgabe letzter Materialien und Hinweis auf das Nachbereitungsprojekt im Unterricht.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section auth-section" id="schuelerbereich">
+      <div class="section-heading">
+        <p class="eyebrow">Schülerbereich</p>
+        <h2>Anmelden oder Zugang anlegen</h2>
+        <p>Schülerinnen und Schüler können hier einen lokalen Zugang anlegen und anschließend ihre Vormerkung schneller ausfüllen.</p>
+      </div>
+
+      <div class="auth-grid">
+        <article class="auth-card">
+          <h3>Neu registrieren</h3>
+          <form id="registerForm" class="auth-form">
+            <label>
+              Name
+              <input name="studentName" autocomplete="name" required>
+            </label>
+            <label>
+              Klasse
+              <input name="studentClass" placeholder="z. B. 8a" required>
+            </label>
+            <label>
+              Schul-E-Mail
+              <input type="email" name="studentEmail" autocomplete="email" required>
+            </label>
+            <label>
+              Persönliche PIN
+              <input type="password" name="studentPin" minlength="4" autocomplete="new-password" required>
+            </label>
+            <button class="button primary" type="submit">Zugang anlegen</button>
+          </form>
+        </article>
+
+        <article class="auth-card">
+          <h3>Anmelden</h3>
+          <form id="loginForm" class="auth-form">
+            <label>
+              Schul-E-Mail
+              <input type="email" name="loginEmail" autocomplete="email" required>
+            </label>
+            <label>
+              PIN
+              <input type="password" name="loginPin" autocomplete="current-password" required>
+            </label>
+            <button class="button primary" type="submit">Einloggen</button>
+          </form>
+        </article>
+
+        <aside class="auth-status" id="authStatus" aria-live="polite"></aside>
+      </div>
+
+      <div class="notice">
+        <strong>Datenschutz-Hinweis:</strong> Dieser Login ist für die statische Website vorbereitet und speichert Daten nur im jeweiligen Browser. Für echte Schülerkonten braucht die Schule ein geschütztes Backend.
       </div>
     </section>
 
@@ -110,7 +220,8 @@
         <label>
           Fahrt
           <select name="trip">
-            <option>Gedenkstättenfahrt 2027</option>
+            <option>Straßburgfahrt 2026 - Jahrgang 8</option>
+            <option>Straßburgfahrt 2026 - Jahrgang 9</option>
             <option>Vorbereitungstreffen</option>
             <option>Interessenliste kommende Fahrt</option>
           </select>
@@ -144,29 +255,29 @@
         <li>
           <span>1</span>
           <div>
-            <h3>Information und Elternbrief</h3>
-            <p>Termin, Ziel, Kostenrahmen, pädagogisches Konzept und Einverständniserklärung werden bereitgestellt.</p>
+            <h3>Information und Unterlagen</h3>
+            <p>Reisezeitraum, Kostenrahmen, pädagogisches Konzept, Ausweispflicht und Einverständniserklärung werden bereitgestellt.</p>
           </div>
         </li>
         <li>
           <span>2</span>
           <div>
-            <h3>Anmeldung und Rückmeldung</h3>
-            <p>Die Schule sammelt Teilnahmewünsche, prüft Plätze und bestätigt die verbindliche Teilnahme.</p>
+            <h3>Vorbereitung und Gruppeneinteilung</h3>
+            <p>Die Schule klärt Regeln, Programmpunkte, Reisejournale, Reflexionsaufträge und Aufgaben für die Dokumentation.</p>
           </div>
         </li>
         <li>
           <span>3</span>
           <div>
-            <h3>Vorbereitung im Unterricht</h3>
-            <p>Historischer Kontext, Biografien, Besuchsregeln und Fragen der Erinnerungskultur werden vorbereitet.</p>
+            <h3>Historische Lernorte</h3>
+            <p>Im Mittelpunkt stehen Straßburg, Natzweiler-Struthof und die Auseinandersetzung mit Biografien, Zwangsarbeit, Deportation und Widerstand.</p>
           </div>
         </li>
         <li>
           <span>4</span>
           <div>
-            <h3>Fahrt und Begleitung</h3>
-            <p>Die Reise wird durch Lehrkräfte begleitet. Zeiten, Treffpunkte und Notfallkontakte stehen im Elternbrief.</p>
+            <h3>Europa und Demokratie</h3>
+            <p>Das Europäische Parlament wird mit Einführung, Planspiel und Reflexion zur europäischen Demokratie eingebunden.</p>
           </div>
         </li>
         <li>
@@ -186,23 +297,23 @@
       </div>
       <div class="payment-grid">
         <article class="payment-card">
-          <span class="amount">50 EUR</span>
-          <h3>Anzahlung</h3>
-          <p>fällig nach Teilnahmebestätigung</p>
+          <span class="amount">250 EUR</span>
+          <h3>Eigenanteil pro Person</h3>
+          <p>laut aktualisierter Kostenübersicht für die Straßburgfahrt 2026</p>
         </article>
         <article class="payment-card">
-          <span class="amount">120 EUR</span>
-          <h3>Teilzahlung</h3>
-          <p>fällig bis 31. Januar 2027</p>
+          <span class="amount">16.233,16 EUR</span>
+          <h3>Gesamtausgaben</h3>
+          <p>Hotel, Bus, Eintritte, Führungen, Museum und gemeinsames Abschlussessen</p>
         </article>
         <article class="payment-card">
-          <span class="amount">Restbetrag</span>
-          <h3>Abschlusszahlung</h3>
-          <p>fällig nach finaler Kostenabrechnung</p>
+          <span class="amount">4.000 EUR</span>
+          <h3>Förderung</h3>
+          <p>in der Kalkulation als Förderbetrag der Sparkasse ausgewiesen</p>
         </article>
       </div>
       <div class="notice">
-        <strong>Hinweis:</strong> Kontodaten, Fördermöglichkeiten und verbindliche Beträge sollten erst nach schulischer Freigabe hier eingetragen werden.
+        <strong>Hinweis:</strong> Verbindliche Zahlungswege, Fristen und Kontodaten sollten nur über schulisch freigegebene Elternbriefe oder geschützte Kanäle veröffentlicht werden.
       </div>
     </section>
 
@@ -210,20 +321,21 @@
       <div class="section-heading">
         <p class="eyebrow">Downloads</p>
         <h2>Elternbriefe und Formulare</h2>
+        <p>Öffentlich verlinkt werden hier nur Unterlagen ohne personenbezogene Daten. Listen mit Schülernamen oder interne Rechnungsunterlagen bleiben im geschützten Schulbereich.</p>
       </div>
       <div class="download-list">
-        <a href="assets/elternbriefe/elternbrief-gedenkstaettenfahrt-2027.pdf" download>
-          <span>Elternbrief Gedenkstättenfahrt 2027</span>
-          <small>PDF hinterlegen unter assets/elternbriefe/</small>
-        </a>
-        <a href="assets/elternbriefe/einverstaendniserklaerung.pdf" download>
+        <article>
+          <span>Elternbrief Straßburgfahrt 2026</span>
+          <small>PDF ohne Teilnahmeliste ergänzen, sobald die finale Version freigegeben ist.</small>
+        </article>
+        <article>
           <span>Einverständniserklärung</span>
-          <small>PDF hinterlegen unter assets/elternbriefe/</small>
-        </a>
-        <a href="assets/elternbriefe/packliste-und-ablauf.pdf" download>
-          <span>Packliste und Ablaufplan</span>
-          <small>PDF hinterlegen unter assets/elternbriefe/</small>
-        </a>
+          <small>Für Download vorbereiten, sobald keine personenbezogenen Daten enthalten sind.</small>
+        </article>
+        <article>
+          <span>Kosteninformation</span>
+          <small>Öffentliche Kurzfassung: 250 EUR Eigenanteil bei ca. 50 Teilnehmenden.</small>
+        </article>
       </div>
     </section>
 

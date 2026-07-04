@@ -149,6 +149,7 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
   min-height: 44px;
   padding: 11px 18px;
   border: 1px solid transparent;
@@ -189,6 +190,10 @@ h3 {
   border-right: 1px solid rgba(255, 255, 255, .14);
 }
 
+.status-band strong {
+  overflow-wrap: anywhere;
+}
+
 .label {
   display: block;
   margin-bottom: 6px;
@@ -217,7 +222,9 @@ h3 {
 
 .feature-grid,
 .payment-grid,
-.archive-grid {
+.archive-grid,
+.trip-grid,
+.program-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
@@ -226,18 +233,107 @@ h3 {
 .feature-grid article,
 .payment-card,
 .video-placeholder,
-.admin-panel {
+.admin-panel,
+.trip-card,
+.program-grid article,
+.auth-card,
+.auth-status {
   border: 1px solid var(--line);
   background: var(--white);
   padding: 24px;
   box-shadow: var(--shadow);
 }
 
+.feature-grid > *,
+.payment-grid > *,
+.archive-grid > *,
+.trip-grid > *,
+.program-grid > *,
+.auth-grid > *,
+.split > *,
+.signup-form > * {
+  min-width: 0;
+}
+
 .feature-grid p,
 .payment-card p,
 .archive-item p,
-.video-placeholder p {
+.video-placeholder p,
+.trip-card p,
+.program-grid p,
+.auth-status p {
   color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.trip-section {
+  background: var(--paper);
+}
+
+.trip-grid {
+  grid-template-columns: 1.15fr .85fr .85fr;
+  margin-bottom: 18px;
+}
+
+.trip-card.strong {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.trip-card.strong .label,
+.trip-card.strong p {
+  color: rgba(255, 255, 255, .72);
+}
+
+.program-grid {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.program-grid span {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 14px;
+  background: var(--blue);
+  color: var(--white);
+  font-weight: 900;
+}
+
+.auth-section {
+  background: var(--band);
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(280px, .85fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-status {
+  min-height: 100%;
+}
+
+.auth-status strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.auth-status .button {
+  margin-top: 12px;
+}
+
+.auth-message {
+  margin-top: 12px;
+  color: var(--accent-dark);
+  font-weight: 800;
 }
 
 .split {
@@ -269,6 +365,7 @@ input,
 select,
 textarea {
   width: 100%;
+  min-width: 0;
   border: 1px solid var(--line);
   background: var(--white);
   color: var(--ink);
@@ -324,6 +421,11 @@ textarea {
 
 .signup-entry small {
   color: var(--muted);
+}
+
+.signup-entry p,
+.signup-entry small {
+  overflow-wrap: anywhere;
 }
 
 .timeline {
@@ -395,7 +497,8 @@ textarea {
   gap: 12px;
 }
 
-.download-list a {
+.download-list a,
+.download-list article {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -495,6 +598,9 @@ footer p {
   .feature-grid,
   .payment-grid,
   .archive-grid,
+  .trip-grid,
+  .program-grid,
+  .auth-grid,
   .split,
   .signup-form {
     grid-template-columns: 1fr;
@@ -514,6 +620,11 @@ footer p {
     min-height: 86vh;
   }
 
+  .section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   h1 {
     font-size: clamp(30px, 8.2vw, 38px);
     overflow-wrap: anywhere;
@@ -527,7 +638,8 @@ footer p {
     margin-bottom: 48px;
   }
 
-  .download-list a {
+  .download-list a,
+  .download-list article {
     align-items: flex-start;
     flex-direction: column;
   }

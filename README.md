@@ -6,6 +6,8 @@ Statische Website für die Koordination der Gedenkstättenfahrten an der Europas
 
 - Anmeldung/Vormerkung mit lokal gespeicherten Testdaten
 - CSV-Export der Vormerkungen
+- Schülerbereich mit lokaler Registrierung und Anmeldung
+- Informationsbereich zur Straßburgfahrt 2026
 - Ablaufübersicht
 - Zahlungs- und Fristenbereich
 - Downloadbereich für Elternbriefe
@@ -13,14 +15,12 @@ Statische Website für die Koordination der Gedenkstättenfahrten an der Europas
 
 ## Dateien ergänzen
 
-Elternbriefe können als PDF in `assets/elternbriefe/` abgelegt werden:
+Elternbriefe können als PDF in `assets/elternbriefe/` abgelegt werden.
 
-- `elternbrief-gedenkstaettenfahrt-2027.pdf`
-- `einverstaendniserklaerung.pdf`
-- `packliste-und-ablauf.pdf`
+Wichtig: Öffentlich sollten nur Dateien ohne Schülernamen, private Kontaktdaten oder interne Rechnungsdaten verlinkt werden.
 
 Fotos vergangener Fahrten können in `assets/archiv/` und Videos in `assets/videos/` abgelegt werden.
 
 ## Hinweis
 
-Die aktuelle Anmeldung ist eine Frontend-Vormerkung und speichert Daten nur im Browser. Für echte personenbezogene Anmeldungen sollte ein geschütztes Formular oder ein Schul-Backend angebunden werden.
+Die aktuelle Anmeldung und der Schülerbereich sind Frontend-Funktionen und speichern Daten nur im Browser. Für echte personenbezogene Anmeldungen sollte ein geschütztes Formular oder ein Schul-Backend angebunden werden.
