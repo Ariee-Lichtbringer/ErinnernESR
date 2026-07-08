@@ -85,6 +85,69 @@
       </article>
 
       <article class="teacher-data-card">
+        <div class="panel-head">
+          <div>
+            <h3>Offizielle Teilnehmer Jahrgang 9</h3>
+            <p class="card-note">Stand: 25.05.2026 | Teilnehmende Jg. 9: 20 | Lehrkräfte: 2</p>
+          </div>
+        </div>
+        <form class="participant-form" id="participantForm">
+          <label>
+            Klasse / Rolle
+            <input name="className" placeholder="z. B. 9c oder Lehrkraft" required>
+          </label>
+          <label>
+            Name
+            <input name="name" autocomplete="name" required>
+          </label>
+          <label class="check">
+            <input type="checkbox" name="motivation">
+            <span>Motivationsschreiben</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" name="consent">
+            <span>Einverständniserklärung</span>
+          </label>
+          <div class="participant-actions">
+            <button class="button primary" type="submit" id="participantSubmit">Schüler hinzufügen</button>
+            <button class="button compact hidden" type="button" id="participantCancel">Abbrechen</button>
+          </div>
+        </form>
+        <div class="teacher-table-wrap">
+          <table class="teacher-table compact-table">
+            <thead>
+              <tr>
+                <th>Klasse</th>
+                <th>Name</th>
+                <th>Motivationsschreiben</th>
+                <th>Einverständniserklärung</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody id="officialParticipantsBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="teacher-data-card">
+        <h3>Ablaufplan Straßburgfahrt 2026</h3>
+        <div class="teacher-table-wrap">
+          <table class="teacher-table schedule-table">
+            <thead>
+              <tr>
+                <th>Datum / Tag</th>
+                <th>Zeit</th>
+                <th>Programmpunkt</th>
+                <th>Ort</th>
+                <th>Details / Aufgaben</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="teacher-data-card">
         <h3>Kontaktdaten der Veranstaltungen</h3>
         <div class="teacher-table-wrap">
           <table class="teacher-table">
@@ -128,26 +191,31 @@
 
       <article class="teacher-data-card">
         <h3>Interne Kostenübersicht</h3>
+        <p class="card-note">Stand / Basis: Kosten_Strassburg_aktualisiert 2.pdf | 38 Schüler/innen, 4 Lehrkräfte</p>
         <div class="teacher-table-wrap">
           <table class="teacher-table">
             <thead>
               <tr>
                 <th>Posten</th>
                 <th>Betrag</th>
+                <th>Hinweis</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Hotel</td><td>9.124,00 EUR</td></tr>
-              <tr><td>Bus</td><td>4.199,16 EUR</td></tr>
-              <tr><td>Natzweiler Eintritt</td><td>395,00 EUR</td></tr>
-              <tr><td>Natzweiler Führungen</td><td>520,00 EUR</td></tr>
-              <tr><td>Museum Alsace Eintritt</td><td>500,00 EUR</td></tr>
-              <tr><td>Museum Alsace Führungen</td><td>500,00 EUR</td></tr>
-              <tr><td>Flammkuchenhaus</td><td>995,00 EUR</td></tr>
-              <tr class="sum-row"><td>Gesamtausgaben</td><td>16.233,16 EUR</td></tr>
-              <tr><td>Eigenanteile Schüler:innen</td><td>12.500,00 EUR</td></tr>
-              <tr><td>Förderung</td><td>4.000,00 EUR</td></tr>
-              <tr class="sum-row"><td>Überschuss laut Kalkulation</td><td>266,84 EUR</td></tr>
+              <tr><td>Hotel</td><td>7.664,16 EUR</td><td>anteilig: 9.124,00 EUR ÷ 50 × SuS + Lehrkräfte</td></tr>
+              <tr><td>Bus (Frericks Reisen)</td><td>4.199,16 EUR</td><td>Auftragsbestätigung Nr. A9425, inkl. MwSt.</td></tr>
+              <tr><td>Natzweiler Eintritt</td><td>395,00 EUR</td><td>Kostenübersicht PDF</td></tr>
+              <tr><td>Natzweiler Führungen</td><td>520,00 EUR</td><td>Kostenübersicht PDF</td></tr>
+              <tr><td>Museum Alsace Eintritt</td><td>500,00 EUR</td><td>Kostenübersicht PDF</td></tr>
+              <tr><td>Museum Alsace Führungen</td><td>500,00 EUR</td><td>Kostenübersicht PDF</td></tr>
+              <tr><td>Essen Flammkuchenhaus</td><td>835,80 EUR</td><td>19,90 EUR × SuS + Lehrkräfte</td></tr>
+              <tr class="sum-row"><td>Gesamtausgaben</td><td>14.614,12 EUR</td><td></td></tr>
+              <tr><td>Eigenanteil SuS</td><td>9.500,00 EUR</td><td>250 EUR pro Schüler/in</td></tr>
+              <tr><td>Sparkasse</td><td>4.000,00 EUR</td><td>Förderung / Zuschuss</td></tr>
+              <tr class="sum-row"><td>Gesamteinnahmen</td><td>13.500,00 EUR</td><td></td></tr>
+              <tr class="sum-row"><td>Überschuss / Fehlbetrag</td><td>-1.114,12 EUR</td><td>positiv = Überschuss</td></tr>
+              <tr><td>Kosten pro Person</td><td>347,96 EUR</td><td>Gesamtausgaben ÷ SuS + Lehrkräfte</td></tr>
+              <tr><td>Netto-Eigenanteil nach möglicher Auszahlung</td><td>113,53 EUR</td><td>bei möglicher Auszahlung von 136,47 EUR je Schüler/in</td></tr>
             </tbody>
           </table>
         </div>

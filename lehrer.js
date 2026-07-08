@@ -2,6 +2,7 @@ const signupStorageKey = "erinnern-esr-signups";
 const studentStorageKey = "erinnern-esr-students";
 const teacherStorageKey = "erinnern-esr-teacher";
 const teacherSessionKey = "erinnern-esr-teacher-active";
+const officialParticipantsStorageKey = "erinnern-esr-official-participants-jg9";
 
 const exportButton = document.querySelector("#exportCsv");
 const teacherSetupCard = document.querySelector("#teacherSetupCard");
@@ -12,6 +13,65 @@ const teacherStatus = document.querySelector("#teacherStatus");
 const teacherInternalPanel = document.querySelector("#uebersicht");
 const teacherStudentList = document.querySelector("#teacherStudentList");
 const refreshTeacherData = document.querySelector("#refreshTeacherData");
+const officialParticipantsBody = document.querySelector("#officialParticipantsBody");
+const scheduleBody = document.querySelector("#scheduleBody");
+const participantForm = document.querySelector("#participantForm");
+const participantSubmit = document.querySelector("#participantSubmit");
+const participantCancel = document.querySelector("#participantCancel");
+
+let participantEditIndex = null;
+
+const defaultOfficialParticipantsJg9 = [
+  { className: "Lehrkraft", name: "Pia Westemeyer", motivation: false, consent: false },
+  { className: "Lehrkraft", name: "Huran Tas", motivation: false, consent: false },
+  { className: "9b", name: "Amiri Rima", motivation: true, consent: true },
+  { className: "9b", name: "Belana Blahnik", motivation: true, consent: true },
+  { className: "9b", name: "Gerharz Theresa", motivation: true, consent: true },
+  { className: "9b", name: "Lenz Merle", motivation: false, consent: false },
+  { className: "9b", name: "Ungan Ecrin", motivation: true, consent: true },
+  { className: "9c", name: "David Sonnenwald", motivation: true, consent: true },
+  { className: "9c", name: "Dobosch Annica", motivation: true, consent: true },
+  { className: "9c", name: "Franken Robin", motivation: true, consent: true },
+  { className: "9c", name: "Funck Juana", motivation: true, consent: true },
+  { className: "9c", name: "Jakobsche Ksawery", motivation: true, consent: true },
+  { className: "9c", name: "Mic Reuter", motivation: true, consent: true },
+  { className: "9c", name: "Schmeer Deen", motivation: true, consent: true },
+  { className: "9c", name: "Söhngen Leandro", motivation: true, consent: true },
+  { className: "9c", name: "vom Hoff Elias", motivation: true, consent: true },
+  { className: "9c", name: "Werbonat Tim", motivation: true, consent: true },
+  { className: "9c, DAZ", name: "Leliuk Maksym", motivation: true, consent: true },
+  { className: "9e", name: "Besic, Mubina", motivation: true, consent: true },
+  { className: "9e", name: "Girdo, Asima", motivation: true, consent: true },
+  { className: "9e", name: "Rogoznikar Helena", motivation: true, consent: true },
+  { className: "9e", name: "van Deelen Maya", motivation: true, consent: false }
+];
+
+const officialSchedule = [
+  ["Mo., 09.11.2026", "07:25", "Abfahrt Europaschule Rheinberg", "Busparkplatz Dr.-Aloys-Wittrup-Straße", "Alle Schüler*innen pünktlich; Personalausweis mitnehmen."],
+  ["Mo., 09.11.2026", "Vormittag", "Busfahrt nach Straßburg", "Bus", "Gepäck im Bus; Tagesrucksack bei SuS; organisatorische Hinweise zu Gruppen, Regeln und Programmpunkten; Ausgabe Reisejournale und Erklärung Reflexionsauftrag."],
+  ["Mo., 09.11.2026", "Ankunft", "Check-in & Orientierung", "Hostel", "Orientierung im Hostel: Räume, Schlüssel, Sicherheitsregeln; Zimmerbezug; kurze Pause; Sammeln im Gemeinschaftsraum."],
+  ["Mo., 09.11.2026", "Nachmittag", "Besuch der Gedenkstätte Straßburg", "Gedenkstätte Straßburg", "Einführung zur historischen Bedeutung der Region; geführte Besichtigung; Arbeitsauftrag: perspektivisches Schreiben, Analyse ausgewählter Gedenktafeln, fotografische Dokumentation für Ausstellung."],
+  ["Mo., 09.11.2026", "Abendessen", "Gemeinsames Essen", "Hostel", "Gemeinsames Abendessen; kurzes Briefing für Tag 2."],
+  ["Mo., 09.11.2026", "Abend", "Reflexionsrunde", "Hostel", "Austausch im Plenum: „Was nehme ich heute mit?“; erste Journal-Einträge zu Erwartungen, Eindrücken und Fragen."],
+  ["Di., 10.11.2026", "Vormittag", "Abfahrt zum KZ Natzweiler-Struthof", "Bus / Vogesenraum", "Fahrt in den Vogesenraum; Vorabgespräch im Bus zu Verhalten auf ehemaligen Lagergeländen und Bedeutung des Ortes."],
+  ["Di., 10.11.2026", "Vormittag / Mittag", "Geführter Rundgang in zwei Gruppen", "KZ Natzweiler-Struthof", "Lagergelände mit Kommandantur, Zellenbau und Appellplatz; Themen: Zwangsarbeit, Alltag der Häftlinge, Deportationswege, Widerstand und Überlebensstrategien."],
+  ["Di., 10.11.2026", "Nachmittag", "Museumsbesuch", "Museum KZ Natzweiler-Struthof", "Ausstellung zur Geschichte des Lagers aus französischer Perspektive; interaktive Arbeitsphasen an Medienstationen."],
+  ["Di., 10.11.2026", "Nachmittag", "Arbeitsphase: Biografien ehemaliger Häftlinge", "Museum / Arbeitsräume", "Gruppenarbeit mit vorbereitetem Biografie-Paket; Ergebnisse im Journal dokumentieren und später in Rheinberg weiterbearbeiten."],
+  ["Di., 10.11.2026", "Abend", "Rückkehr, Essen & Journalarbeit", "Hostel", "Gemeinsames Abendessen; schriftliche Verarbeitung des Tages als Pflichtteil."],
+  ["Mi., 11.11.2026", "Vormittag", "Europäisches Parlament Straßburg", "Europäisches Parlament", "Einlass und Sicherheitskontrolle; Einführung durch Mitarbeiter*innen zu Aufbau der EU, Rolle des Parlaments sowie Arbeitsprozessen und Gesetzgebungswegen."],
+  ["Mi., 11.11.2026", "Vormittag / Mittag", "Planspiel: EU-Entscheidungsprozesse erleben", "Europäisches Parlament", "SuS übernehmen Rollen von Abgeordneten; Bearbeitung eines Gesetzesvorschlags; Diskussion, Antragstellung, Ausschussdebatten und fiktive Plenarsitzung."],
+  ["Mi., 11.11.2026", "Nachmittag", "Austausch & Fragerunde", "Europäisches Parlament", "Eigene Fragen stellen; Reflexionsrunde zu europäischer Demokratie."],
+  ["Mi., 11.11.2026", "Später Nachmittag", "Freizeit in Kleingruppen", "Straßburg Innenstadt", "Bewegung in zugeteilten Gruppen; Aufsichtsrouten festgelegt; Aufgaben: Recherche zur europäischen Identität Straßburgs und Fotodokumentation „Europa vor Ort“."],
+  ["Mi., 11.11.2026", "Abend", "Reflexion im Hostel", "Hostel", "Austausch: „Wie funktioniert Demokratie auf EU-Ebene?“; Journalfortsetzung."],
+  ["Do., 12.11.2026", "09:00", "Abfahrt vom Hostel", "Hostel / Bus", "Abfahrt zum Musée Alsace."],
+  ["Do., 12.11.2026", "11:00", "Geführter Rundgang im Musée Alsace", "Musée Alsace", "Einführung in die Regionalgeschichte: Elsass zwischen Deutschland und Frankreich; Besuch verschiedener Themenhäuser; Erkundungsbogen „Wie verändert Erinnerung Kultur?“; zwei Gruppen parallel geführt."],
+  ["Do., 12.11.2026", "12:30", "Arbeitsphase", "Musée Alsace", "Kleingruppen dokumentieren je ein Themenhaus; Ergebnisse fließen später in die Ausstellung ein."],
+  ["Do., 12.11.2026", "14:30", "Zeitzeugenunterricht", "Musée Alsace / Seminarraum", "Begegnung mit einer Person mit familiären oder persönlichen Erfahrungen zu Krieg, Vertreibung oder Grenzregionsthemen; Frageblock durch SuS vorbereitet."],
+  ["Do., 12.11.2026", "18:00", "Abendessen im Flammkuchenhaus", "Flammkuchenhaus", "Gemeinsames Essen als Abschluss des offiziellen Programms."],
+  ["Do., 12.11.2026", "20:00", "Abschluss- und Feedbackrunde", "Hostel", "Reflexion der Woche; Übergabe kleiner Aufgaben für die Nachbereitung; Fotosichtung und Projektankündigung „Ausstellung Straßburg 2026“."],
+  ["Fr., 13.11.2026", "02:06", "Abfahrt Straßburg", "Gare Centrale Straßburg", "Nachtfahrt zurück nach Rheinberg; Ruhezeit im Bus; abschließende organisatorische Hinweise."],
+  ["Fr., 13.11.2026", "Ankunft", "Ankunft an der Europaschule Rheinberg", "Europaschule Rheinberg", "Ausgabe letzter Materialien; Verabschiedung; Hinweis auf Nachbereitungsprojekt im Unterricht."]
+];
 
 function readJson(key, fallback) {
   try {
@@ -31,6 +91,14 @@ function readSignups() {
 
 function readStudents() {
   return readJson(studentStorageKey, []);
+}
+
+function readOfficialParticipants() {
+  return readJson(officialParticipantsStorageKey, defaultOfficialParticipantsJg9);
+}
+
+function writeOfficialParticipants(participants) {
+  writeJson(officialParticipantsStorageKey, participants);
 }
 
 function getTeacherAccount() {
@@ -143,6 +211,66 @@ function renderTeacherStudents() {
   `).join("");
 }
 
+function renderOfficialParticipants() {
+  const participants = readOfficialParticipants();
+
+  officialParticipantsBody.innerHTML = participants.map((participant, index) => `
+    <tr>
+      <td>${escapeHtml(participant.className)}</td>
+      <td>${escapeHtml(participant.name)}</td>
+      <td>${participant.motivation ? "x" : ""}</td>
+      <td>${participant.consent ? "x" : ""}</td>
+      <td>
+        <div class="row-actions">
+          <button class="button compact" type="button" data-edit-participant="${index}">Bearbeiten</button>
+          <button class="button compact" type="button" data-delete-participant="${index}">Entfernen</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function resetParticipantForm() {
+  participantEditIndex = null;
+  participantForm.reset();
+  participantSubmit.textContent = "Schüler hinzufügen";
+  participantCancel.classList.add("hidden");
+}
+
+function startParticipantEdit(index) {
+  const participant = readOfficialParticipants()[index];
+  if (!participant) return;
+
+  participantEditIndex = index;
+  participantForm.elements.className.value = participant.className;
+  participantForm.elements.name.value = participant.name;
+  participantForm.elements.motivation.checked = Boolean(participant.motivation);
+  participantForm.elements.consent.checked = Boolean(participant.consent);
+  participantSubmit.textContent = "Änderung speichern";
+  participantCancel.classList.remove("hidden");
+  participantForm.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function removeParticipant(index) {
+  const participants = readOfficialParticipants();
+  participants.splice(index, 1);
+  writeOfficialParticipants(participants);
+  resetParticipantForm();
+  renderOfficialParticipants();
+}
+
+function renderSchedule() {
+  scheduleBody.innerHTML = officialSchedule.map(([date, time, program, place, details]) => `
+    <tr>
+      <td>${escapeHtml(date)}</td>
+      <td>${escapeHtml(time)}</td>
+      <td>${escapeHtml(program)}</td>
+      <td>${escapeHtml(place)}</td>
+      <td>${escapeHtml(details)}</td>
+    </tr>
+  `).join("");
+}
+
 function renderTeacher(message = "") {
   const teacher = getTeacherAccount();
   const active = isTeacherActive() && teacher;
@@ -170,6 +298,8 @@ function renderTeacher(message = "") {
   }
 
   renderTeacherStudents();
+  renderOfficialParticipants();
+  renderSchedule();
   teacherStatus.innerHTML = `
     <strong>Lehrerbereich geöffnet</strong>
     <p>${escapeHtml(teacher.name)} kann die gespeicherten Vormerkungen einsehen und exportieren.</p>
@@ -218,7 +348,52 @@ teacherStatus.addEventListener("click", event => {
 
 refreshTeacherData.addEventListener("click", () => {
   renderTeacherStudents();
+  renderOfficialParticipants();
   renderTeacher("Daten aktualisiert.");
+});
+
+participantForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const data = new FormData(participantForm);
+  const participants = readOfficialParticipants();
+  const participant = {
+    className: String(data.get("className") || "").trim(),
+    name: String(data.get("name") || "").trim(),
+    motivation: data.has("motivation"),
+    consent: data.has("consent")
+  };
+
+  if (participantEditIndex === null) {
+    participants.push(participant);
+  } else {
+    participants[participantEditIndex] = participant;
+  }
+
+  participants.sort((a, b) => {
+    const classCompare = String(a.className).localeCompare(String(b.className), "de");
+    if (classCompare) return classCompare;
+    return String(a.name).localeCompare(String(b.name), "de");
+  });
+
+  writeOfficialParticipants(participants);
+  resetParticipantForm();
+  renderOfficialParticipants();
+});
+
+participantCancel.addEventListener("click", resetParticipantForm);
+
+officialParticipantsBody.addEventListener("click", event => {
+  const editButton = event.target.closest("[data-edit-participant]");
+  const deleteButton = event.target.closest("[data-delete-participant]");
+
+  if (editButton) {
+    startParticipantEdit(Number(editButton.dataset.editParticipant));
+    return;
+  }
+
+  if (deleteButton) {
+    removeParticipant(Number(deleteButton.dataset.deleteParticipant));
+  }
 });
 
 exportButton.addEventListener("click", () => {

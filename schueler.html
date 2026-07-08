@@ -18,6 +18,7 @@
         <a href="index.html">Startseite</a>
         <a href="#schuelerbereich">Login</a>
         <a href="#anmeldung">Vormerkung</a>
+        <a href="#unterlagen">Unterlagen</a>
         <a href="intern.html">Interner Bereich</a>
       </div>
     </nav>
@@ -137,6 +138,44 @@
         <p>Registrierte Schülerinnen und Schüler kommen von hier in den internen Bereich mit Aufgaben, Material und Reisejournal.</p>
         <a class="button primary" href="intern.html">Interner Bereich</a>
       </aside>
+    </section>
+
+    <section class="section documents-section" id="unterlagen">
+      <div class="section-heading">
+        <p class="eyebrow">Unterlagen</p>
+        <h2>Einverständniserklärung hochladen und unterschreiben</h2>
+        <p>Schülerinnen und Schüler können ein Foto der Einverständniserklärung im Browser speichern und eine digitale Unterschrift ergänzen.</p>
+      </div>
+
+      <div class="documents-grid">
+        <article class="document-card">
+          <h3>Einverständniserklärung als Bild</h3>
+          <form class="auth-form" id="documentUploadForm">
+            <label>
+              Foto auswählen
+              <input type="file" name="consentImage" accept="image/*" required>
+            </label>
+            <button class="button primary" type="submit">Bild speichern</button>
+          </form>
+          <div class="document-preview" id="documentPreview"></div>
+        </article>
+
+        <article class="document-card">
+          <h3>Digitale Unterschrift</h3>
+          <div class="signature-pad-wrap">
+            <canvas id="signaturePad" width="720" height="220" aria-label="Unterschriftsfeld"></canvas>
+          </div>
+          <div class="participant-actions">
+            <button class="button primary" type="button" id="saveSignature">Unterschrift speichern</button>
+            <button class="button compact" type="button" id="clearSignature">Neu unterschreiben</button>
+          </div>
+          <div class="signature-preview" id="signaturePreview"></div>
+        </article>
+      </div>
+
+      <div class="notice">
+        <strong>Hinweis:</strong> Upload und Unterschrift werden in dieser Version nur lokal im Browser gespeichert. Für verbindliche digitale Abgaben braucht die Schule später ein geschütztes Backend.
+      </div>
     </section>
   </main>
 

@@ -198,6 +198,12 @@ h3 {
   background: var(--paper);
 }
 
+.button:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
 .hidden {
   display: none !important;
 }
@@ -389,6 +395,10 @@ h3 {
   background: var(--band);
 }
 
+.documents-section {
+  background: var(--paper);
+}
+
 .teacher-section {
   background: var(--paper);
 }
@@ -410,6 +420,49 @@ h3 {
 .auth-form {
   display: grid;
   gap: 14px;
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.document-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--white);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.document-preview,
+.signature-preview {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.document-preview img,
+.signature-preview img {
+  max-width: 100%;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.signature-pad-wrap {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.signature-pad-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 220px;
+  touch-action: none;
+  background: var(--white);
 }
 
 .auth-status {
@@ -460,6 +513,12 @@ h3 {
   margin-bottom: 16px;
 }
 
+.teacher-data-card .card-note {
+  margin: -8px 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .teacher-student-list {
   display: grid;
   gap: 16px;
@@ -494,6 +553,14 @@ h3 {
   font-size: 14px;
 }
 
+.teacher-table.compact-table {
+  min-width: 560px;
+}
+
+.teacher-table.schedule-table {
+  min-width: 980px;
+}
+
 .teacher-table th,
 .teacher-table td {
   padding: 12px;
@@ -515,6 +582,25 @@ h3 {
   color: var(--ink);
   font-weight: 900;
   background: #f4f1eb;
+}
+
+.participant-form {
+  display: grid;
+  grid-template-columns: minmax(150px, .8fr) minmax(210px, 1.2fr) minmax(160px, auto) minmax(190px, auto) auto;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.participant-actions,
+.row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.row-actions .button {
+  min-height: 32px;
 }
 
 .auth-message {
@@ -796,9 +882,11 @@ footer p {
   .program-grid,
   .auth-grid,
   .teacher-grid,
+  .documents-grid,
   .dashboard-grid,
   .material-grid,
   .split,
+  .participant-form,
   .signup-form {
     grid-template-columns: 1fr;
   }

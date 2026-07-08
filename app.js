@@ -1,11 +1,18 @@
 const signupStorageKey = "erinnern-esr-signups";
 const studentStorageKey = "erinnern-esr-students";
 const sessionStorageKey = "erinnern-esr-active-student";
+const documentStorageKey = "erinnern-esr-student-documents";
 
 const form = document.querySelector("#signupForm");
 const registerForm = document.querySelector("#registerForm");
 const loginForm = document.querySelector("#loginForm");
 const authStatus = document.querySelector("#authStatus");
+const documentUploadForm = document.querySelector("#documentUploadForm");
+const documentPreview = document.querySelector("#documentPreview");
+const signaturePad = document.querySelector("#signaturePad");
+const saveSignature = document.querySelector("#saveSignature");
+const clearSignature = document.querySelector("#clearSignature");
+const signaturePreview = document.querySelector("#signaturePreview");
 
 function readJson(key, fallback) {
   try {
@@ -35,6 +42,14 @@ function writeStudents(students) {
   writeJson(studentStorageKey, students);
 }
 
+function readDocuments() {
+  return readJson(documentStorageKey, {});
+}
+
+function writeDocuments(documents) {
+  writeJson(documentStorageKey, documents);
+}
+
 function getActiveStudent() {
   const activeId = localStorage.getItem(sessionStorageKey);
   if (!activeId) return null;
@@ -47,6 +62,24 @@ function setActiveStudent(student) {
   } else {
     localStorage.removeItem(sessionStorageKey);
   }
+}
+
+function getActiveStudentDocuments() {
+  const activeStudent = getActiveStudent();
+  if (!activeStudent) return null;
+  return readDocuments()[activeStudent.id] || {};
+}
+
+function writeActiveStudentDocuments(update) {
+  const activeStudent = getActiveStudent();
+  if (!activeStudent) return false;
+  const documents = readDocuments();
+  documents[activeStudent.id] = {
+    ...(documents[activeStudent.id] || {}),
+    ...update
+  };
+  writeDocuments(documents);
+  return true;
 }
 
 function escapeHtml(value) {
@@ -85,6 +118,7 @@ function renderAuth(message = "") {
       <p>Lege einen Zugang an oder melde dich mit deiner Schul-E-Mail und PIN an. Danach werden Name, Klasse und E-Mail in die Vormerkung übernommen.</p>
       ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
     `;
+    renderDocuments();
     return;
   }
 
@@ -97,6 +131,102 @@ function renderAuth(message = "") {
     ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
   `;
   prefillSignup(activeStudent);
+  renderDocuments();
+}
+
+function renderDocuments(message = "") {
+  const activeStudent = getActiveStudent();
+  const fieldsDisabled = !activeStudent;
+  const documents = getActiveStudentDocuments();
+
+  documentUploadForm.querySelector("button").disabled = fieldsDisabled;
+  documentUploadForm.elements.consentImage.disabled = fieldsDisabled;
+  saveSignature.disabled = fieldsDisabled;
+  clearSignature.disabled = fieldsDisabled;
+
+  if (!activeStudent) {
+    documentPreview.innerHTML = "<p class=\"empty\">Bitte zuerst anmelden, damit die Unterlagen einem Schülerzugang zugeordnet werden können.</p>";
+    signaturePreview.innerHTML = "";
+    return;
+  }
+
+  documentPreview.innerHTML = documents?.consentImage ? `
+    <img src="${documents.consentImage}" alt="Hochgeladene Einverständniserklärung">
+    <a class="button compact" href="${documents.consentImage}" target="_blank" rel="noopener">Bild öffnen</a>
+    ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
+  ` : `
+    <p class="empty">Noch kein Bild gespeichert.</p>
+    ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
+  `;
+
+  signaturePreview.innerHTML = documents?.signature ? `
+    <strong>Gespeicherte Unterschrift</strong>
+    <img src="${documents.signature}" alt="Gespeicherte digitale Unterschrift">
+  ` : "<p class=\"empty\">Noch keine Unterschrift gespeichert.</p>";
+}
+
+function resizeImageFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("error", reject);
+    reader.addEventListener("load", () => {
+      const image = new Image();
+      image.addEventListener("error", reject);
+      image.addEventListener("load", () => {
+        const maxWidth = 1400;
+        const scale = Math.min(1, maxWidth / image.width);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(image.width * scale);
+        canvas.height = Math.round(image.height * scale);
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", .86));
+      });
+      image.src = reader.result;
+    });
+    reader.readAsDataURL(file);
+  });
+}
+
+function setupSignaturePad() {
+  const context = signaturePad.getContext("2d");
+  let drawing = false;
+
+  context.lineWidth = 3;
+  context.lineCap = "round";
+  context.strokeStyle = "#17211f";
+
+  function pointFromEvent(event) {
+    const rect = signaturePad.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * (signaturePad.width / rect.width),
+      y: (event.clientY - rect.top) * (signaturePad.height / rect.height)
+    };
+  }
+
+  signaturePad.addEventListener("pointerdown", event => {
+    if (!getActiveStudent()) return;
+    drawing = true;
+    signaturePad.setPointerCapture(event.pointerId);
+    const point = pointFromEvent(event);
+    context.beginPath();
+    context.moveTo(point.x, point.y);
+  });
+
+  signaturePad.addEventListener("pointermove", event => {
+    if (!drawing) return;
+    const point = pointFromEvent(event);
+    context.lineTo(point.x, point.y);
+    context.stroke();
+  });
+
+  signaturePad.addEventListener("pointerup", () => {
+    drawing = false;
+  });
+
+  signaturePad.addEventListener("pointercancel", () => {
+    drawing = false;
+  });
 }
 
 registerForm.addEventListener("submit", event => {
@@ -173,4 +303,45 @@ form.addEventListener("submit", event => {
   renderAuth("Vormerkung gespeichert.");
 });
 
+documentUploadForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const file = documentUploadForm.elements.consentImage.files[0];
+  if (!file || !getActiveStudent()) {
+    renderDocuments("Bitte zuerst anmelden und ein Bild auswählen.");
+    return;
+  }
+
+  const imageData = await resizeImageFile(file);
+  writeActiveStudentDocuments({
+    consentImage: imageData,
+    consentImageName: file.name,
+    consentImageUpdatedAt: new Date().toISOString()
+  });
+  documentUploadForm.reset();
+  renderDocuments("Einverständniserklärung gespeichert.");
+});
+
+saveSignature.addEventListener("click", () => {
+  if (!getActiveStudent()) {
+    renderDocuments("Bitte zuerst anmelden.");
+    return;
+  }
+
+  writeActiveStudentDocuments({
+    signature: signaturePad.toDataURL("image/png"),
+    signatureUpdatedAt: new Date().toISOString()
+  });
+  renderDocuments("Unterschrift gespeichert.");
+});
+
+clearSignature.addEventListener("click", () => {
+  signaturePad.getContext("2d").clearRect(0, 0, signaturePad.width, signaturePad.height);
+  writeActiveStudentDocuments({
+    signature: "",
+    signatureUpdatedAt: new Date().toISOString()
+  });
+  renderDocuments("Unterschrift gelöscht.");
+});
+
+setupSignaturePad();
 renderAuth();
