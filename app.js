@@ -1,6 +1,8 @@
 const signupStorageKey = "erinnern-esr-signups";
 const studentStorageKey = "erinnern-esr-students";
 const sessionStorageKey = "erinnern-esr-active-student";
+const sessionDataStorageKey = "erinnern-esr-active-student-data";
+const sessionTokenStorageKey = "erinnern-esr-session-token";
 const documentStorageKey = "erinnern-esr-student-documents";
 const profileStorageKey = "erinnern-esr-student-profiles";
 
@@ -16,6 +18,7 @@ const clearSignature = document.querySelector("#clearSignature");
 const signaturePreview = document.querySelector("#signaturePreview");
 const studentProfileForm = document.querySelector("#studentProfileForm");
 const profileMessage = document.querySelector("#profileMessage");
+const studentOnlyElements = document.querySelectorAll(".student-only");
 
 function readJson(key, fallback) {
   try {
@@ -27,6 +30,27 @@ function readJson(key, fallback) {
 
 function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
+}
+
+async function apiRequest(path, options = {}) {
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+  const token = localStorage.getItem(sessionTokenStorageKey);
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const response = await fetch(path, {
+    ...options,
+    headers
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "Speichern auf dem Server fehlgeschlagen.");
+  }
+
+  return data;
 }
 
 function readSignups() {
@@ -62,16 +86,18 @@ function writeProfiles(profiles) {
 }
 
 function getActiveStudent() {
-  const activeId = localStorage.getItem(sessionStorageKey);
-  if (!activeId) return null;
-  return readStudents().find(student => student.id === activeId) || null;
+  return readJson(sessionDataStorageKey, null);
 }
 
-function setActiveStudent(student) {
+function setActiveStudent(student, token = "") {
   if (student) {
     localStorage.setItem(sessionStorageKey, student.id);
+    writeJson(sessionDataStorageKey, student);
+    if (token) localStorage.setItem(sessionTokenStorageKey, token);
   } else {
     localStorage.removeItem(sessionStorageKey);
+    localStorage.removeItem(sessionDataStorageKey);
+    localStorage.removeItem(sessionTokenStorageKey);
   }
 }
 
@@ -81,7 +107,7 @@ function getActiveStudentDocuments() {
   return readDocuments()[activeStudent.id] || {};
 }
 
-function writeActiveStudentDocuments(update) {
+async function writeActiveStudentDocuments(update) {
   const activeStudent = getActiveStudent();
   if (!activeStudent) return false;
   const documents = readDocuments();
@@ -89,6 +115,10 @@ function writeActiveStudentDocuments(update) {
     ...(documents[activeStudent.id] || {}),
     ...update
   };
+  await apiRequest("/api/students/me/documents", {
+    method: "PUT",
+    body: JSON.stringify({ documents: documents[activeStudent.id] })
+  });
   writeDocuments(documents);
   return true;
 }
@@ -99,9 +129,13 @@ function getActiveStudentProfile() {
   return readProfiles()[activeStudent.id] || {};
 }
 
-function writeActiveStudentProfile(profile) {
+async function writeActiveStudentProfile(profile) {
   const activeStudent = getActiveStudent();
   if (!activeStudent) return false;
+  await apiRequest("/api/students/me/profile", {
+    method: "PUT",
+    body: JSON.stringify({ profile })
+  });
   const profiles = readProfiles();
   profiles[activeStudent.id] = {
     ...(profiles[activeStudent.id] || {}),
@@ -110,6 +144,24 @@ function writeActiveStudentProfile(profile) {
   };
   writeProfiles(profiles);
   return true;
+}
+
+async function loadRemoteStudentData() {
+  const activeStudent = getActiveStudent();
+  if (!activeStudent) return;
+
+  const [profileResult, documentResult] = await Promise.all([
+    apiRequest("/api/students/me/profile"),
+    apiRequest("/api/students/me/documents")
+  ]);
+
+  const profiles = readProfiles();
+  profiles[activeStudent.id] = profileResult.profile || {};
+  writeProfiles(profiles);
+
+  const documents = readDocuments();
+  documents[activeStudent.id] = documentResult.documents || {};
+  writeDocuments(documents);
 }
 
 function escapeHtml(value) {
@@ -146,8 +198,20 @@ function showStudentArea(target = "angaben") {
   section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function renderStudentVisibility() {
+  const activeStudent = getActiveStudent();
+  studentOnlyElements.forEach(element => {
+    element.classList.toggle("hidden", !activeStudent);
+  });
+
+  if (!activeStudent && ["#angaben", "#anmeldung", "#unterlagen", "#aktionen"].includes(window.location.hash)) {
+    window.location.hash = "schuelerbereich";
+  }
+}
+
 function renderAuth(message = "") {
   const activeStudent = getActiveStudent();
+  renderStudentVisibility();
 
   if (!activeStudent) {
     authStatus.innerHTML = `
@@ -292,49 +356,52 @@ function setupSignaturePad() {
   });
 }
 
-registerForm.addEventListener("submit", event => {
+registerForm.addEventListener("submit", async event => {
   event.preventDefault();
   const data = new FormData(registerForm);
   const email = normalizeEmail(data.get("studentEmail"));
-  const students = readStudents();
 
-  if (students.some(student => student.email === email)) {
-    renderAuth("Für diese E-Mail gibt es bereits einen Zugang.");
-    return;
+  try {
+    const result = await apiRequest("/api/students/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: String(data.get("studentName") || "").trim(),
+        className: String(data.get("studentClass") || "").trim(),
+        email,
+        pin: String(data.get("studentPin") || "")
+      })
+    });
+
+    setActiveStudent(result.student, result.token);
+    await loadRemoteStudentData();
+    registerForm.reset();
+    renderAuth("Zugang angelegt. Du bist jetzt angemeldet.");
+    showStudentArea("angaben");
+  } catch (error) {
+    renderAuth(error.message);
   }
-
-  const student = {
-    id: crypto.randomUUID(),
-    name: String(data.get("studentName") || "").trim(),
-    className: String(data.get("studentClass") || "").trim(),
-    email,
-    pin: String(data.get("studentPin") || "")
-  };
-
-  students.push(student);
-  writeStudents(students);
-  setActiveStudent(student);
-  registerForm.reset();
-  renderAuth("Zugang angelegt. Du bist jetzt angemeldet.");
-  showStudentArea("angaben");
 });
 
-loginForm.addEventListener("submit", event => {
+loginForm.addEventListener("submit", async event => {
   event.preventDefault();
   const data = new FormData(loginForm);
   const email = normalizeEmail(data.get("loginEmail"));
   const pin = String(data.get("loginPin") || "");
-  const student = readStudents().find(entry => entry.email === email && entry.pin === pin);
 
-  if (!student) {
-    renderAuth("E-Mail oder PIN stimmt nicht.");
-    return;
+  try {
+    const result = await apiRequest("/api/students/login", {
+      method: "POST",
+      body: JSON.stringify({ email, pin })
+    });
+
+    setActiveStudent(result.student, result.token);
+    await loadRemoteStudentData();
+    loginForm.reset();
+    renderAuth("Erfolgreich angemeldet.");
+    showStudentArea("angaben");
+  } catch (error) {
+    renderAuth(error.message);
   }
-
-  setActiveStudent(student);
-  loginForm.reset();
-  renderAuth("Erfolgreich angemeldet.");
-  showStudentArea("angaben");
 });
 
 authStatus.addEventListener("click", event => {
@@ -342,17 +409,22 @@ authStatus.addEventListener("click", event => {
   if (!button) return;
   setActiveStudent(null);
   renderAuth("Du bist abgemeldet.");
+  showStudentArea("schuelerbereich");
 });
 
-form.addEventListener("submit", event => {
+form.addEventListener("submit", async event => {
   event.preventDefault();
   const data = new FormData(form);
-  const signups = readSignups();
   const activeStudent = getActiveStudent();
 
-  signups.push({
+  if (!activeStudent) {
+    renderAuth("Bitte zuerst einloggen.");
+    return;
+  }
+
+  const signup = {
     createdAt: new Date().toISOString(),
-    studentAccount: activeStudent ? activeStudent.id : "",
+    studentAccount: activeStudent.id,
     student: data.get("student"),
     className: data.get("className"),
     guardian: data.get("guardian"),
@@ -360,16 +432,23 @@ form.addEventListener("submit", event => {
     phone: data.get("phone"),
     trip: data.get("trip"),
     notes: data.get("notes"),
-    profile: activeStudent ? getActiveStudentProfile() : {}
-  });
+    profile: getActiveStudentProfile()
+  };
 
-  writeSignups(signups);
-  form.reset();
-  if (activeStudent) prefillSignup(activeStudent);
-  renderAuth("Vormerkung gespeichert.");
+  try {
+    await apiRequest("/api/students/me/signups", {
+      method: "POST",
+      body: JSON.stringify({ signup })
+    });
+    form.reset();
+    prefillSignup(activeStudent);
+    renderAuth("Vormerkung gespeichert.");
+  } catch (error) {
+    renderAuth(error.message);
+  }
 });
 
-studentProfileForm.addEventListener("submit", event => {
+studentProfileForm.addEventListener("submit", async event => {
   event.preventDefault();
   const activeStudent = getActiveStudent();
   if (!activeStudent) {
@@ -379,15 +458,19 @@ studentProfileForm.addEventListener("submit", event => {
 
   const data = new FormData(studentProfileForm);
   const profile = Object.fromEntries(data.entries());
-  writeActiveStudentProfile(profile);
+  try {
+    await writeActiveStudentProfile(profile);
 
-  form.elements.guardian.value = profile.parent1Name || form.elements.guardian.value;
-  form.elements.phone.value = profile.parent1Phone || form.elements.phone.value;
-  form.elements.notes.value = [profile.allergies, profile.medication, profile.food, profile.supportNotes]
-    .filter(Boolean)
-    .join("\n");
+    form.elements.guardian.value = profile.parent1Name || form.elements.guardian.value;
+    form.elements.phone.value = profile.parent1Phone || form.elements.phone.value;
+    form.elements.notes.value = [profile.allergies, profile.medication, profile.food, profile.supportNotes]
+      .filter(Boolean)
+      .join("\n");
 
-  renderProfile("Angaben gespeichert.");
+    renderProfile("Angaben gespeichert.");
+  } catch (error) {
+    renderProfile(error.message);
+  }
 });
 
 documentUploadForm.addEventListener("submit", async event => {
@@ -399,35 +482,47 @@ documentUploadForm.addEventListener("submit", async event => {
   }
 
   const imageData = await resizeImageFile(file);
-  writeActiveStudentDocuments({
-    consentImage: imageData,
-    consentImageName: file.name,
-    consentImageUpdatedAt: new Date().toISOString()
-  });
-  documentUploadForm.reset();
-  renderDocuments("Einverständniserklärung gespeichert.");
+  try {
+    await writeActiveStudentDocuments({
+      consentImage: imageData,
+      consentImageName: file.name,
+      consentImageUpdatedAt: new Date().toISOString()
+    });
+    documentUploadForm.reset();
+    renderDocuments("Einverständniserklärung gespeichert.");
+  } catch (error) {
+    renderDocuments(error.message);
+  }
 });
 
-saveSignature.addEventListener("click", () => {
+saveSignature.addEventListener("click", async () => {
   if (!getActiveStudent()) {
     renderDocuments("Bitte zuerst anmelden.");
     return;
   }
 
-  writeActiveStudentDocuments({
-    signature: signaturePad.toDataURL("image/png"),
-    signatureUpdatedAt: new Date().toISOString()
-  });
-  renderDocuments("Unterschrift gespeichert.");
+  try {
+    await writeActiveStudentDocuments({
+      signature: signaturePad.toDataURL("image/png"),
+      signatureUpdatedAt: new Date().toISOString()
+    });
+    renderDocuments("Unterschrift gespeichert.");
+  } catch (error) {
+    renderDocuments(error.message);
+  }
 });
 
-clearSignature.addEventListener("click", () => {
+clearSignature.addEventListener("click", async () => {
   signaturePad.getContext("2d").clearRect(0, 0, signaturePad.width, signaturePad.height);
-  writeActiveStudentDocuments({
-    signature: "",
-    signatureUpdatedAt: new Date().toISOString()
-  });
-  renderDocuments("Unterschrift gelöscht.");
+  try {
+    await writeActiveStudentDocuments({
+      signature: "",
+      signatureUpdatedAt: new Date().toISOString()
+    });
+    renderDocuments("Unterschrift gelöscht.");
+  } catch (error) {
+    renderDocuments(error.message);
+  }
 });
 
 setupSignaturePad();

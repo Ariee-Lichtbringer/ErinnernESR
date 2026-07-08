@@ -24,6 +24,7 @@ const participantSubmit = document.querySelector("#participantSubmit");
 const participantCancel = document.querySelector("#participantCancel");
 
 let participantEditIndex = null;
+let remoteTeacherStudents = [];
 
 const defaultOfficialParticipants = [
   { className: "8a", name: "Fechner, Leni", motivation: true, consent: true, gender: "Mädchen" },
@@ -117,6 +118,10 @@ function readProfiles() {
   return readJson(profileStorageKey, {});
 }
 
+function writeProfiles(profiles) {
+  writeJson(profileStorageKey, profiles);
+}
+
 function readOfficialParticipants() {
   const stored = readJson(officialParticipantsStorageKey, null);
   const storedVersion = localStorage.getItem(officialParticipantsVersionKey);
@@ -200,6 +205,27 @@ function toCsvValue(value) {
   return `"${String(value || "").replace(/"/g, "\"\"")}"`;
 }
 
+async function loadRemoteTeacherStudents() {
+  const teacher = getTeacherAccount();
+  if (!teacher?.pin) return;
+
+  const response = await fetch("/api/teacher/students", {
+    headers: { "X-Teacher-Pin": teacher.pin }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || "Railway-Schülerdaten konnten nicht geladen werden.");
+  }
+
+  remoteTeacherStudents = data.students || [];
+
+  const profiles = readProfiles();
+  remoteTeacherStudents.forEach(student => {
+    profiles[student.id] = student.profile || {};
+  });
+  writeProfiles(profiles);
+}
+
 function collectTeacherStudents() {
   const byKey = new Map();
   const profiles = readProfiles();
@@ -235,6 +261,29 @@ function collectTeacherStudents() {
       source: existing ? `${existing.source} + Registriert` : "Registriert",
       motivation: existing?.motivation || "",
       consent: existing?.consent || "",
+      profile
+    });
+  });
+
+  remoteTeacherStudents.forEach(student => {
+    const importedKey = participantKey(student);
+    const key = byKey.has(importedKey) ? importedKey : (student.email || student.id);
+    const existing = byKey.get(key);
+    const profile = student.profile || profiles[student.id] || {};
+    const hasConsentImage = Boolean(student.documents?.consentImage);
+    const hasSignature = Boolean(student.documents?.signature);
+    byKey.set(key, {
+      name: student.name || existing?.name || "",
+      className: student.className || existing?.className || "",
+      email: student.email || existing?.email || "",
+      guardian: profile.parent1Name || existing?.guardian || "",
+      phone: profile.parent1Phone || existing?.phone || "",
+      trip: existing?.trip || "",
+      source: existing ? `${existing.source} + Railway` : "Railway",
+      motivation: existing?.motivation || "",
+      consent: existing?.consent || hasConsentImage,
+      uploadedConsent: hasConsentImage,
+      signature: hasSignature,
       profile
     });
   });
@@ -308,7 +357,12 @@ function renderTeacherStudents() {
                   student.profile?.supportNotes || ""
                 ].filter(Boolean).join(" | "))}</td>
                 <td>${escapeHtml(student.trip)}</td>
-                <td>${student.motivation ? "Motivation" : ""}${student.motivation && student.consent ? " | " : ""}${student.consent ? "Einverständnis" : ""}</td>
+                <td>${[
+                  student.motivation ? "Motivation" : "",
+                  student.consent ? "Einverständnis" : "",
+                  student.uploadedConsent ? "Upload" : "",
+                  student.signature ? "Unterschrift" : ""
+                ].filter(Boolean).join(" | ")}</td>
                 <td>${escapeHtml(student.source)}</td>
               </tr>
             `).join("")}
@@ -409,9 +463,19 @@ function renderTeacher(message = "") {
   renderTeacherStudents();
   renderOfficialParticipants();
   renderSchedule();
+  loadRemoteTeacherStudents()
+    .then(() => {
+      renderTeacherStudents();
+      teacherStatus.querySelector(".remote-load-status")?.remove();
+    })
+    .catch(error => {
+      const status = teacherStatus.querySelector(".remote-load-status");
+      if (status) status.textContent = error.message;
+    });
   teacherStatus.innerHTML = `
     <strong>Lehrerbereich geöffnet</strong>
     <p>${escapeHtml(teacher.name)} kann die gespeicherten Vormerkungen einsehen und exportieren.</p>
+    <p class="remote-load-status">Railway-Schülerdaten werden geladen …</p>
     <a class="button primary" href="#uebersicht">Zur Übersicht</a>
     <button class="button compact" type="button" id="teacherLogoutButton">Lehrerbereich schließen</button>
     ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
@@ -455,10 +519,15 @@ teacherStatus.addEventListener("click", event => {
   renderTeacher("Lehrerbereich geschlossen.");
 });
 
-refreshTeacherData.addEventListener("click", () => {
-  renderTeacherStudents();
-  renderOfficialParticipants();
-  renderTeacher("Daten aktualisiert.");
+refreshTeacherData.addEventListener("click", async () => {
+  try {
+    await loadRemoteTeacherStudents();
+    renderTeacherStudents();
+    renderOfficialParticipants();
+    renderTeacher("Daten aktualisiert.");
+  } catch (error) {
+    renderTeacher(error.message);
+  }
 });
 
 importOfficialParticipants.addEventListener("click", () => {

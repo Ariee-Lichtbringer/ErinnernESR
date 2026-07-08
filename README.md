@@ -1,12 +1,12 @@
 # Erinnern ESR
 
-Statische Website für die Koordination der Gedenkstättenfahrten an der Europaschule.
+Website für die Koordination der Gedenkstättenfahrten an der Europaschule.
 
 ## Inhalte
 
-- Anmeldung/Vormerkung mit lokal gespeicherten Testdaten
+- Anmeldung/Vormerkung mit Schülerlogin
 - CSV-Export der Vormerkungen
-- Schülerbereich mit lokaler Registrierung und Anmeldung
+- Schülerbereich mit Registrierung, Anmeldung, Angaben, Unterlagen-Upload und digitaler Unterschrift
 - Lehrerzugang zur lokalen Verwaltung von Vormerkungen, Schülerlisten, Kontakten und interner Kostenübersicht
 - Interner Schülerbereich unter `intern.html`
 - Informationsbereich zur Straßburgfahrt 2026
@@ -23,6 +23,20 @@ Wichtig: Öffentlich sollten nur Dateien ohne Schülernamen, private Kontaktdate
 
 Fotos vergangener Fahrten können in `assets/archiv/` und Videos in `assets/videos/` abgelegt werden.
 
-## Hinweis
+## Railway
 
-Die aktuelle Anmeldung und der Schülerbereich sind Frontend-Funktionen und speichern Daten nur im Browser. Für echte personenbezogene Anmeldungen sollte ein geschütztes Formular oder ein Schul-Backend angebunden werden.
+Für Railway ist ein Node-Server enthalten.
+
+Startbefehl:
+
+```bash
+npm start
+```
+
+Empfohlene Railway-Variablen:
+
+- `DATABASE_URL`: wird automatisch gesetzt, wenn eine Railway-Postgres-Datenbank verbunden ist.
+- `SESSION_SECRET`: zufälliger langer Geheimwert für Schüler-Sessions.
+- `TEACHER_PIN`: PIN, mit der die Lehrerseite serverseitige Schülerdaten abrufen darf.
+
+Ohne `DATABASE_URL` speichert der Server lokal in `data/students.json`. Das ist nur für lokale Tests gedacht.

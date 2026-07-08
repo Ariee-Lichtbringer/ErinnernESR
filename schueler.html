@@ -17,10 +17,10 @@
       <div class="nav-links">
         <a href="index.html">Startseite</a>
         <a href="#schuelerbereich">Login</a>
-        <a href="#angaben">Meine Angaben</a>
-        <a href="#anmeldung">Vormerkung</a>
-        <a href="#unterlagen">Unterlagen</a>
-        <a href="intern.html">Interner Bereich</a>
+        <a class="student-only" href="#angaben">Meine Angaben</a>
+        <a class="student-only" href="#anmeldung">Vormerkung</a>
+        <a class="student-only" href="#unterlagen">Unterlagen</a>
+        <a class="student-only" href="intern.html">Interner Bereich</a>
       </div>
     </nav>
 
@@ -28,7 +28,7 @@
       <p class="eyebrow">Schülerzugang</p>
       <h1>Anmeldung und Vormerkung</h1>
       <p class="hero-copy">Zugang anlegen, einloggen und die eigene Teilnahme für Straßburg 2026 vormerken.</p>
-      <div class="hero-actions">
+      <div class="hero-actions student-only">
         <a class="button primary" href="#unterlagen">Unterlagen hochladen</a>
         <a class="button secondary" href="#schuelerbereich">Einloggen</a>
       </div>
@@ -90,7 +90,7 @@
       </div>
     </section>
 
-    <section class="section action-section" id="aktionen">
+    <section class="section action-section student-only" id="aktionen">
       <div class="quick-actions">
         <a class="button primary large-button" href="#angaben">Meine Angaben ergänzen</a>
         <a class="button primary large-button" href="#unterlagen">Einverständniserklärung hochladen</a>
@@ -98,7 +98,7 @@
       </div>
     </section>
 
-    <section class="section profile-section" id="angaben">
+    <section class="section profile-section student-only" id="angaben">
       <div class="section-heading">
         <p class="eyebrow">Meine Angaben</p>
         <h2>Kontaktdaten und wichtige Hinweise ergänzen</h2>
@@ -166,7 +166,7 @@
       </form>
     </section>
 
-    <section class="section split" id="anmeldung">
+    <section class="section split student-only" id="anmeldung">
       <div class="section-heading">
         <p class="eyebrow">Anmeldung</p>
         <h2>Teilnahme vormerken</h2>
@@ -221,7 +221,7 @@
       </aside>
     </section>
 
-    <section class="section documents-section" id="unterlagen">
+    <section class="section documents-section student-only" id="unterlagen">
       <div class="section-heading">
         <p class="eyebrow">Unterlagen</p>
         <h2>Einverständniserklärung hochladen und unterschreiben</h2>
