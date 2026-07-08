@@ -399,6 +399,16 @@ input:disabled {
   background: var(--paper);
 }
 
+.action-section {
+  padding-top: 28px;
+  padding-bottom: 28px;
+  background: var(--ink);
+}
+
+.profile-section {
+  background: #f4f1eb;
+}
+
 .teacher-section {
   background: var(--paper);
 }
@@ -420,6 +430,31 @@ input:disabled {
 .auth-form {
   display: grid;
   gap: 14px;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.large-button {
+  min-height: 58px;
+  padding: 15px 22px;
+  font-size: 17px;
+}
+
+.light-button {
+  border-color: rgba(255, 255, 255, .55);
+  background: rgba(255, 255, 255, .12);
+  color: var(--white);
+}
+
+.student-profile-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 1180px;
 }
 
 .documents-grid {
@@ -887,6 +922,7 @@ footer p {
   .material-grid,
   .split,
   .participant-form,
+  .student-profile-form,
   .signup-form {
     grid-template-columns: 1fr;
   }

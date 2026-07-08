@@ -2,6 +2,7 @@ const signupStorageKey = "erinnern-esr-signups";
 const studentStorageKey = "erinnern-esr-students";
 const sessionStorageKey = "erinnern-esr-active-student";
 const documentStorageKey = "erinnern-esr-student-documents";
+const profileStorageKey = "erinnern-esr-student-profiles";
 
 const form = document.querySelector("#signupForm");
 const registerForm = document.querySelector("#registerForm");
@@ -13,6 +14,8 @@ const signaturePad = document.querySelector("#signaturePad");
 const saveSignature = document.querySelector("#saveSignature");
 const clearSignature = document.querySelector("#clearSignature");
 const signaturePreview = document.querySelector("#signaturePreview");
+const studentProfileForm = document.querySelector("#studentProfileForm");
+const profileMessage = document.querySelector("#profileMessage");
 
 function readJson(key, fallback) {
   try {
@@ -50,6 +53,14 @@ function writeDocuments(documents) {
   writeJson(documentStorageKey, documents);
 }
 
+function readProfiles() {
+  return readJson(profileStorageKey, {});
+}
+
+function writeProfiles(profiles) {
+  writeJson(profileStorageKey, profiles);
+}
+
 function getActiveStudent() {
   const activeId = localStorage.getItem(sessionStorageKey);
   if (!activeId) return null;
@@ -79,6 +90,25 @@ function writeActiveStudentDocuments(update) {
     ...update
   };
   writeDocuments(documents);
+  return true;
+}
+
+function getActiveStudentProfile() {
+  const activeStudent = getActiveStudent();
+  if (!activeStudent) return null;
+  return readProfiles()[activeStudent.id] || {};
+}
+
+function writeActiveStudentProfile(profile) {
+  const activeStudent = getActiveStudent();
+  if (!activeStudent) return false;
+  const profiles = readProfiles();
+  profiles[activeStudent.id] = {
+    ...(profiles[activeStudent.id] || {}),
+    ...profile,
+    updatedAt: new Date().toISOString()
+  };
+  writeProfiles(profiles);
   return true;
 }
 
@@ -119,6 +149,7 @@ function renderAuth(message = "") {
       ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
     `;
     renderDocuments();
+    renderProfile();
     return;
   }
 
@@ -132,6 +163,29 @@ function renderAuth(message = "") {
   `;
   prefillSignup(activeStudent);
   renderDocuments();
+  renderProfile();
+}
+
+function renderProfile(message = "") {
+  const activeStudent = getActiveStudent();
+  const fields = [...studentProfileForm.elements].filter(field => field.name);
+
+  fields.forEach(field => {
+    field.disabled = !activeStudent;
+  });
+
+  studentProfileForm.querySelector("button").disabled = !activeStudent;
+
+  if (!activeStudent) {
+    profileMessage.textContent = "Bitte zuerst anmelden, damit die Angaben gespeichert werden können.";
+    return;
+  }
+
+  const profile = getActiveStudentProfile();
+  fields.forEach(field => {
+    field.value = profile?.[field.name] || "";
+  });
+  profileMessage.textContent = message;
 }
 
 function renderDocuments(message = "") {
@@ -294,13 +348,35 @@ form.addEventListener("submit", event => {
     email: data.get("email"),
     phone: data.get("phone"),
     trip: data.get("trip"),
-    notes: data.get("notes")
+    notes: data.get("notes"),
+    profile: activeStudent ? getActiveStudentProfile() : {}
   });
 
   writeSignups(signups);
   form.reset();
   if (activeStudent) prefillSignup(activeStudent);
   renderAuth("Vormerkung gespeichert.");
+});
+
+studentProfileForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const activeStudent = getActiveStudent();
+  if (!activeStudent) {
+    renderProfile("Bitte zuerst anmelden.");
+    return;
+  }
+
+  const data = new FormData(studentProfileForm);
+  const profile = Object.fromEntries(data.entries());
+  writeActiveStudentProfile(profile);
+
+  form.elements.guardian.value = profile.parent1Name || form.elements.guardian.value;
+  form.elements.phone.value = profile.parent1Phone || form.elements.phone.value;
+  form.elements.notes.value = [profile.allergies, profile.medication, profile.food, profile.supportNotes]
+    .filter(Boolean)
+    .join("\n");
+
+  renderProfile("Angaben gespeichert.");
 });
 
 documentUploadForm.addEventListener("submit", async event => {

@@ -1,5 +1,6 @@
 const signupStorageKey = "erinnern-esr-signups";
 const studentStorageKey = "erinnern-esr-students";
+const profileStorageKey = "erinnern-esr-student-profiles";
 const teacherStorageKey = "erinnern-esr-teacher";
 const teacherSessionKey = "erinnern-esr-teacher-active";
 const officialParticipantsStorageKey = "erinnern-esr-official-participants-jg9";
@@ -112,6 +113,10 @@ function readStudents() {
   return readJson(studentStorageKey, []);
 }
 
+function readProfiles() {
+  return readJson(profileStorageKey, {});
+}
+
 function readOfficialParticipants() {
   const stored = readJson(officialParticipantsStorageKey, null);
   const storedVersion = localStorage.getItem(officialParticipantsVersionKey);
@@ -197,6 +202,7 @@ function toCsvValue(value) {
 
 function collectTeacherStudents() {
   const byKey = new Map();
+  const profiles = readProfiles();
 
   readOfficialParticipants().forEach(participant => {
     if (participant.className === "Lehrkraft") return;
@@ -209,7 +215,8 @@ function collectTeacherStudents() {
       trip: participant.className?.startsWith("9") ? "Straßburgfahrt 2026 - Jahrgang 9" : "Straßburgfahrt 2026 - Jahrgang 8",
       source: "Importierte TN-Liste",
       motivation: participant.motivation,
-      consent: participant.consent
+      consent: participant.consent,
+      profile: {}
     });
   });
 
@@ -217,16 +224,18 @@ function collectTeacherStudents() {
     const importedKey = participantKey(student);
     const key = byKey.has(importedKey) ? importedKey : (student.email || student.id);
     const existing = byKey.get(key);
+    const profile = profiles[student.id] || existing?.profile || {};
     byKey.set(key, {
       name: student.name,
       className: student.className,
       email: student.email,
-      guardian: existing?.guardian || "",
-      phone: existing?.phone || "",
+      guardian: profile.parent1Name || existing?.guardian || "",
+      phone: profile.parent1Phone || existing?.phone || "",
       trip: existing?.trip || "",
       source: existing ? `${existing.source} + Registriert` : "Registriert",
       motivation: existing?.motivation || "",
-      consent: existing?.consent || ""
+      consent: existing?.consent || "",
+      profile
     });
   });
 
@@ -243,7 +252,8 @@ function collectTeacherStudents() {
       trip: signup.trip || "",
       source: existing ? `${existing.source} + Vormerkung` : "Vormerkung",
       motivation: existing?.motivation || "",
-      consent: existing?.consent || ""
+      consent: existing?.consent || "",
+      profile: signup.profile || existing?.profile || {}
     });
   });
 
@@ -279,6 +289,7 @@ function renderTeacherStudents() {
               <th>Name</th>
               <th>E-Mail</th>
               <th>Kontakt Eltern</th>
+              <th>Gesundheit / Hinweise</th>
               <th>Fahrt</th>
               <th>Unterlagen</th>
               <th>Status</th>
@@ -290,6 +301,12 @@ function renderTeacherStudents() {
                 <td>${escapeHtml(student.name)}</td>
                 <td>${escapeHtml(student.email)}</td>
                 <td>${escapeHtml([student.guardian, student.phone].filter(Boolean).join(" | "))}</td>
+                <td>${escapeHtml([
+                  student.profile?.allergies ? `Allergien: ${student.profile.allergies}` : "",
+                  student.profile?.medication ? `Medizin: ${student.profile.medication}` : "",
+                  student.profile?.food ? `Ernährung: ${student.profile.food}` : "",
+                  student.profile?.supportNotes || ""
+                ].filter(Boolean).join(" | "))}</td>
                 <td>${escapeHtml(student.trip)}</td>
                 <td>${student.motivation ? "Motivation" : ""}${student.motivation && student.consent ? " | " : ""}${student.consent ? "Einverständnis" : ""}</td>
                 <td>${escapeHtml(student.source)}</td>
@@ -495,13 +512,22 @@ officialParticipantsBody.addEventListener("click", event => {
 
 exportButton.addEventListener("click", () => {
   const students = collectTeacherStudents();
-  const headers = ["Name", "Klasse", "E-Mail", "Kontakt Eltern", "Telefon", "Fahrt", "Motivationsschreiben", "Einverstaendniserklaerung", "Status"];
+  const headers = ["Name", "Klasse", "E-Mail", "Kontakt 1", "Telefon 1", "E-Mail Kontakt 1", "Kontakt 2", "Telefon 2", "E-Mail Kontakt 2", "Allergien", "Medikamente", "Ernaehrung", "Schwimmen", "Weitere Hinweise", "Fahrt", "Motivationsschreiben", "Einverstaendniserklaerung", "Status"];
   const rows = students.map(entry => [
     entry.name,
     entry.className,
     entry.email,
-    entry.guardian,
-    entry.phone,
+    entry.profile?.parent1Name || entry.guardian,
+    entry.profile?.parent1Phone || entry.phone,
+    entry.profile?.parent1Email || "",
+    entry.profile?.parent2Name || "",
+    entry.profile?.parent2Phone || "",
+    entry.profile?.parent2Email || "",
+    entry.profile?.allergies || "",
+    entry.profile?.medication || "",
+    entry.profile?.food || "",
+    entry.profile?.swimming || "",
+    entry.profile?.supportNotes || "",
     entry.trip,
     entry.motivation ? "ja" : "",
     entry.consent ? "ja" : "",
