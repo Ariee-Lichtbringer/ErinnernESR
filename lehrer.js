@@ -3,6 +3,8 @@ const studentStorageKey = "erinnern-esr-students";
 const teacherStorageKey = "erinnern-esr-teacher";
 const teacherSessionKey = "erinnern-esr-teacher-active";
 const officialParticipantsStorageKey = "erinnern-esr-official-participants-jg9";
+const officialParticipantsVersionKey = "erinnern-esr-official-participants-version";
+const officialParticipantsVersion = "2";
 
 const exportButton = document.querySelector("#exportCsv");
 const teacherSetupCard = document.querySelector("#teacherSetupCard");
@@ -13,6 +15,7 @@ const teacherStatus = document.querySelector("#teacherStatus");
 const teacherInternalPanel = document.querySelector("#uebersicht");
 const teacherStudentList = document.querySelector("#teacherStudentList");
 const refreshTeacherData = document.querySelector("#refreshTeacherData");
+const importOfficialParticipants = document.querySelector("#importOfficialParticipants");
 const officialParticipantsBody = document.querySelector("#officialParticipantsBody");
 const scheduleBody = document.querySelector("#scheduleBody");
 const participantForm = document.querySelector("#participantForm");
@@ -21,7 +24,21 @@ const participantCancel = document.querySelector("#participantCancel");
 
 let participantEditIndex = null;
 
-const defaultOfficialParticipantsJg9 = [
+const defaultOfficialParticipants = [
+  { className: "8a", name: "Fechner, Leni", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8a", name: "Jana Golitz", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8a", name: "Kraemer, Jan Paul", motivation: false, consent: true, gender: "Junge" },
+  { className: "8a", name: "Ramadanaj, Leonit", motivation: true, consent: true, gender: "Junge" },
+  { className: "8a", name: "Schermer, Isa", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8a", name: "Schubert Janna", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8d", name: "Akyildiz, Alim", motivation: true, consent: true, gender: "Junge" },
+  { className: "8d", name: "Birkholz, Jule", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8e", name: "Assenmacher Hannah", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8e", name: "Karabulut, Merve", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8e", name: "Köhler, Felix", motivation: true, consent: true, gender: "Junge" },
+  { className: "8e", name: "Leni Albert", motivation: true, consent: true, gender: "Mädchen" },
+  { className: "8e", name: "Tim Helm", motivation: true, consent: true, gender: "Junge" },
+  { className: "8e", name: "Wehr, Dominik", motivation: true, consent: true, gender: "Junge" },
   { className: "Lehrkraft", name: "Pia Westemeyer", motivation: false, consent: false },
   { className: "Lehrkraft", name: "Huran Tas", motivation: false, consent: false },
   { className: "9b", name: "Amiri Rima", motivation: true, consent: true },
@@ -43,7 +60,9 @@ const defaultOfficialParticipantsJg9 = [
   { className: "9e", name: "Besic, Mubina", motivation: true, consent: true },
   { className: "9e", name: "Girdo, Asima", motivation: true, consent: true },
   { className: "9e", name: "Rogoznikar Helena", motivation: true, consent: true },
-  { className: "9e", name: "van Deelen Maya", motivation: true, consent: false }
+  { className: "9e", name: "van Deelen Maya", motivation: true, consent: false },
+  { className: "Lehrkraft", name: "Julia Sonnenwald", motivation: false, consent: false },
+  { className: "Lehrkraft", name: "Martin Reichert", motivation: false, consent: false }
 ];
 
 const officialSchedule = [
@@ -94,11 +113,56 @@ function readStudents() {
 }
 
 function readOfficialParticipants() {
-  return readJson(officialParticipantsStorageKey, defaultOfficialParticipantsJg9);
+  const stored = readJson(officialParticipantsStorageKey, null);
+  const storedVersion = localStorage.getItem(officialParticipantsVersionKey);
+
+  if (!stored) {
+    writeOfficialParticipants(defaultOfficialParticipants);
+    localStorage.setItem(officialParticipantsVersionKey, officialParticipantsVersion);
+    return defaultOfficialParticipants;
+  }
+
+  if (storedVersion !== officialParticipantsVersion) {
+    const merged = mergeParticipants(defaultOfficialParticipants, stored);
+    writeOfficialParticipants(merged);
+    localStorage.setItem(officialParticipantsVersionKey, officialParticipantsVersion);
+    return merged;
+  }
+
+  return stored;
 }
 
 function writeOfficialParticipants(participants) {
   writeJson(officialParticipantsStorageKey, participants);
+}
+
+function participantKey(participant) {
+  return `${String(participant.className || "").trim().toLowerCase()}|${String(participant.name || "").trim().toLowerCase()}`;
+}
+
+function mergeParticipants(baseParticipants, extraParticipants) {
+  const byKey = new Map();
+  baseParticipants.forEach(participant => {
+    byKey.set(participantKey(participant), participant);
+  });
+  extraParticipants.forEach(participant => {
+    byKey.set(participantKey(participant), {
+      className: participant.className || "",
+      name: participant.name || "",
+      motivation: Boolean(participant.motivation),
+      consent: Boolean(participant.consent),
+      gender: participant.gender || ""
+    });
+  });
+  return sortParticipants([...byKey.values()]);
+}
+
+function sortParticipants(participants) {
+  return [...participants].sort((a, b) => {
+    const classCompare = String(a.className).localeCompare(String(b.className), "de", { numeric: true });
+    if (classCompare) return classCompare;
+    return String(a.name).localeCompare(String(b.name), "de");
+  });
 }
 
 function getTeacherAccount() {
@@ -134,18 +198,41 @@ function toCsvValue(value) {
 function collectTeacherStudents() {
   const byKey = new Map();
 
+  readOfficialParticipants().forEach(participant => {
+    if (participant.className === "Lehrkraft") return;
+    byKey.set(participantKey(participant), {
+      name: participant.name,
+      className: participant.className,
+      email: "",
+      guardian: "",
+      phone: "",
+      trip: participant.className?.startsWith("9") ? "Straßburgfahrt 2026 - Jahrgang 9" : "Straßburgfahrt 2026 - Jahrgang 8",
+      source: "Importierte TN-Liste",
+      motivation: participant.motivation,
+      consent: participant.consent
+    });
+  });
+
   readStudents().forEach(student => {
-    const key = student.email || student.id;
+    const importedKey = participantKey(student);
+    const key = byKey.has(importedKey) ? importedKey : (student.email || student.id);
+    const existing = byKey.get(key);
     byKey.set(key, {
       name: student.name,
       className: student.className,
       email: student.email,
-      source: "Registriert"
+      guardian: existing?.guardian || "",
+      phone: existing?.phone || "",
+      trip: existing?.trip || "",
+      source: existing ? `${existing.source} + Registriert` : "Registriert",
+      motivation: existing?.motivation || "",
+      consent: existing?.consent || ""
     });
   });
 
   readSignups().forEach(signup => {
-    const key = signup.email || `${signup.student}-${signup.className}`;
+    const signupKey = participantKey({ className: signup.className, name: signup.student });
+    const key = byKey.has(signupKey) ? signupKey : (signup.email || signupKey);
     const existing = byKey.get(key);
     byKey.set(key, {
       name: signup.student || existing?.name || "",
@@ -154,7 +241,9 @@ function collectTeacherStudents() {
       guardian: signup.guardian || "",
       phone: signup.phone || "",
       trip: signup.trip || "",
-      source: existing ? "Registriert + Vormerkung" : "Vormerkung"
+      source: existing ? `${existing.source} + Vormerkung` : "Vormerkung",
+      motivation: existing?.motivation || "",
+      consent: existing?.consent || ""
     });
   });
 
@@ -191,6 +280,7 @@ function renderTeacherStudents() {
               <th>E-Mail</th>
               <th>Kontakt Eltern</th>
               <th>Fahrt</th>
+              <th>Unterlagen</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -201,6 +291,7 @@ function renderTeacherStudents() {
                 <td>${escapeHtml(student.email)}</td>
                 <td>${escapeHtml([student.guardian, student.phone].filter(Boolean).join(" | "))}</td>
                 <td>${escapeHtml(student.trip)}</td>
+                <td>${student.motivation ? "Motivation" : ""}${student.motivation && student.consent ? " | " : ""}${student.consent ? "Einverständnis" : ""}</td>
                 <td>${escapeHtml(student.source)}</td>
               </tr>
             `).join("")}
@@ -257,6 +348,7 @@ function removeParticipant(index) {
   writeOfficialParticipants(participants);
   resetParticipantForm();
   renderOfficialParticipants();
+  renderTeacherStudents();
 }
 
 function renderSchedule() {
@@ -352,6 +444,16 @@ refreshTeacherData.addEventListener("click", () => {
   renderTeacher("Daten aktualisiert.");
 });
 
+importOfficialParticipants.addEventListener("click", () => {
+  const merged = mergeParticipants(defaultOfficialParticipants, readOfficialParticipants());
+  writeOfficialParticipants(merged);
+  localStorage.setItem(officialParticipantsVersionKey, officialParticipantsVersion);
+  resetParticipantForm();
+  renderOfficialParticipants();
+  renderTeacherStudents();
+  renderTeacher("Namen aus der Tabelle importiert.");
+});
+
 participantForm.addEventListener("submit", event => {
   event.preventDefault();
   const data = new FormData(participantForm);
@@ -369,15 +471,10 @@ participantForm.addEventListener("submit", event => {
     participants[participantEditIndex] = participant;
   }
 
-  participants.sort((a, b) => {
-    const classCompare = String(a.className).localeCompare(String(b.className), "de");
-    if (classCompare) return classCompare;
-    return String(a.name).localeCompare(String(b.name), "de");
-  });
-
-  writeOfficialParticipants(participants);
+  writeOfficialParticipants(sortParticipants(participants));
   resetParticipantForm();
   renderOfficialParticipants();
+  renderTeacherStudents();
 });
 
 participantCancel.addEventListener("click", resetParticipantForm);
@@ -397,18 +494,18 @@ officialParticipantsBody.addEventListener("click", event => {
 });
 
 exportButton.addEventListener("click", () => {
-  const signups = readSignups();
-  const headers = ["Zeitpunkt", "Schuelerzugang", "Name", "Klasse", "Erziehungsberechtigte", "E-Mail", "Telefon", "Fahrt", "Hinweise"];
-  const rows = signups.map(entry => [
-    entry.createdAt,
-    entry.studentAccount,
-    entry.student,
+  const students = collectTeacherStudents();
+  const headers = ["Name", "Klasse", "E-Mail", "Kontakt Eltern", "Telefon", "Fahrt", "Motivationsschreiben", "Einverstaendniserklaerung", "Status"];
+  const rows = students.map(entry => [
+    entry.name,
     entry.className,
-    entry.guardian,
     entry.email,
+    entry.guardian,
     entry.phone,
     entry.trip,
-    entry.notes
+    entry.motivation ? "ja" : "",
+    entry.consent ? "ja" : "",
+    entry.source
   ]);
 
   const csv = [headers, ...rows].map(row => row.map(toCsvValue).join(",")).join("\n");
