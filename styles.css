@@ -832,6 +832,17 @@ textarea {
   color: rgba(255, 255, 255, .66);
 }
 
+.teacher-download-list a,
+.teacher-download-list article {
+  border-color: var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.teacher-download-list small {
+  color: var(--muted);
+}
+
 .archive-grid {
   grid-template-columns: 1.35fr .65fr;
 }
