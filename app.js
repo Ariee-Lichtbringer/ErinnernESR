@@ -184,10 +184,12 @@ function prefillSignup(student) {
   form.elements.className.value = student.className;
   form.elements.email.value = student.email;
 
-  if (student.className.trim().startsWith("9")) {
-    form.elements.trip.value = "Straßburgfahrt 2026 - Jahrgang 9";
+  if (student.trip) {
+    form.elements.trip.value = student.trip;
+  } else if (student.className.trim().startsWith("9")) {
+    form.elements.trip.value = "Straßburgfahrt 2026";
   } else if (student.className.trim().startsWith("8")) {
-    form.elements.trip.value = "Straßburgfahrt 2026 - Jahrgang 8";
+    form.elements.trip.value = "Straßburgfahrt 2026";
   }
 }
 
@@ -367,6 +369,7 @@ registerForm.addEventListener("submit", async event => {
       body: JSON.stringify({
         name: String(data.get("studentName") || "").trim(),
         className: String(data.get("studentClass") || "").trim(),
+        trip: String(data.get("studentTrip") || "").trim(),
         email,
         pin: String(data.get("studentPin") || "")
       })

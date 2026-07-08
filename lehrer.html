@@ -39,7 +39,7 @@
 
       <div class="teacher-grid">
         <article class="teacher-card" id="teacherSetupCard">
-          <h3>Lehrer-PIN einrichten</h3>
+          <h3>Lehrerzugang beantragen</h3>
           <form id="teacherSetupForm" class="auth-form">
             <label>
               Name der Lehrkraft
@@ -49,7 +49,7 @@
               Lehrer-PIN
               <input type="password" name="teacherPin" minlength="4" autocomplete="new-password" required>
             </label>
-            <button class="button primary" type="submit">Zugang einrichten</button>
+            <button class="button primary" type="submit">Zugang beantragen</button>
           </form>
         </article>
 
@@ -57,10 +57,29 @@
           <h3>Als Lehrkraft anmelden</h3>
           <form id="teacherLoginForm" class="auth-form">
             <label>
+              Name der Lehrkraft
+              <input name="teacherLoginName" autocomplete="username" required>
+            </label>
+            <label>
               Lehrer-PIN
               <input type="password" name="teacherLoginPin" autocomplete="current-password" required>
             </label>
             <button class="button primary" type="submit">Lehrerbereich öffnen</button>
+          </form>
+        </article>
+
+        <article class="teacher-card" id="teacherAdminCard">
+          <h3>Admin anmelden</h3>
+          <form id="teacherAdminForm" class="auth-form">
+            <label>
+              Admin-Kürzel
+              <input name="adminName" autocomplete="username" required>
+            </label>
+            <label>
+              Admin-Passwort
+              <input type="password" name="adminPassword" autocomplete="current-password" required>
+            </label>
+            <button class="button primary" type="submit">Adminbereich öffnen</button>
           </form>
         </article>
 
@@ -78,6 +97,10 @@
         <div class="download-list teacher-download-list">
           <a href="assets/elternbriefe/elternbrief-strassburg-2026.pdf" download>
             <span>1. Elternbrief Straßburg</span>
+            <small>PDF herunterladen</small>
+          </a>
+          <a href="assets/elternbriefe/elternbrief-strassburg-2026-anzahlung.pdf" download>
+            <span>2. Elternbrief Erinnerung, Anzahlung und Rückläufer</span>
             <small>PDF herunterladen</small>
           </a>
         </div>
@@ -111,6 +134,14 @@
             Name
             <input name="name" autocomplete="name" required>
           </label>
+          <label>
+            Geschlecht
+            <select name="gender">
+              <option value="">Bitte wählen</option>
+              <option value="weiblich">weiblich</option>
+              <option value="männlich">männlich</option>
+            </select>
+          </label>
           <label class="check">
             <input type="checkbox" name="motivation">
             <span>Motivationsschreiben</span>
@@ -130,6 +161,7 @@
               <tr>
                 <th>Klasse</th>
                 <th>Name</th>
+                <th>Geschlecht</th>
                 <th>Motivationsschreiben</th>
                 <th>Einverständniserklärung</th>
                 <th>Aktion</th>
@@ -236,9 +268,13 @@
 
   <footer>
     <p>Europaschule | Lehrerzugang</p>
-    <a href="index.html">Zur Startseite</a>
+    <div class="footer-links">
+      <a href="datenschutz.html">Datenschutz</a>
+      <a href="index.html">Zur Startseite</a>
+    </div>
   </footer>
 
+  <script src="privacy.js"></script>
   <script src="lehrer.js"></script>
 </body>
 </html>

@@ -58,6 +58,10 @@ a {
   color: var(--white);
 }
 
+.compact-hero {
+  min-height: 38vh;
+}
+
 .internal-hero-content {
   width: min(760px, calc(100% - 36px));
   margin: auto 0 8vh clamp(18px, 6vw, 86px);
@@ -504,6 +508,38 @@ input:disabled {
   min-height: 100%;
 }
 
+.help-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.help-steps article {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.help-steps span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  background: var(--blue);
+  color: var(--white);
+  font-weight: 900;
+}
+
+.help-steps p {
+  margin: 0;
+  color: var(--muted);
+}
+
 .teacher-card,
 .teacher-status {
   min-width: 0;
@@ -528,6 +564,48 @@ input:disabled {
 .teacher-status p {
   color: var(--muted);
   overflow-wrap: anywhere;
+}
+
+.teacher-approval-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.teacher-approval-panel h4 {
+  margin: 8px 0 0;
+  font-size: 16px;
+}
+
+.approval-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.approval-row p {
+  margin: 0;
+}
+
+.approval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.danger-button {
+  border-color: rgba(153, 27, 27, .3);
+  color: #991b1b;
+}
+
+.account-actions {
+  display: grid;
+  gap: 8px;
 }
 
 .teacher-internal {
@@ -611,6 +689,53 @@ input:disabled {
 
 .teacher-table td {
   color: var(--muted);
+}
+
+.student-name-payment {
+  display: grid;
+  gap: 7px;
+  min-width: 180px;
+}
+
+.student-name-payment strong {
+  color: var(--ink);
+}
+
+.student-name-payment small,
+.payment-summary {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.payment-progress {
+  height: 9px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #f5e7df;
+}
+
+.payment-progress span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+}
+
+.payment-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.payment-input {
+  display: grid;
+  grid-template-columns: 54px minmax(72px, 1fr);
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.payment-input input {
+  padding: 7px 8px;
 }
 
 .teacher-table .sum-row td {
@@ -790,6 +915,16 @@ textarea {
   font-weight: 900;
 }
 
+.contact-card .amount {
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.contact-card a {
+  color: var(--blue);
+  font-weight: 800;
+}
+
 .notice {
   margin-top: 18px;
   padding: 18px 20px;
@@ -909,6 +1044,50 @@ footer {
   color: var(--muted);
 }
 
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: flex-end;
+}
+
+.privacy-consent {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(23, 33, 31, .62);
+}
+
+.privacy-consent-box {
+  width: min(560px, 100%);
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.privacy-consent-box h2 {
+  font-size: 28px;
+}
+
+.privacy-consent-box p {
+  color: var(--muted);
+}
+
+.privacy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.text-section {
+  background: var(--white);
+}
+
 footer p {
   margin: 0;
 }
@@ -927,6 +1106,7 @@ footer p {
   .trip-grid,
   .program-grid,
   .auth-grid,
+  .help-steps,
   .teacher-grid,
   .documents-grid,
   .dashboard-grid,

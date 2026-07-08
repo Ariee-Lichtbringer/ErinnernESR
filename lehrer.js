@@ -1,8 +1,18 @@
 const signupStorageKey = "erinnern-esr-signups";
 const studentStorageKey = "erinnern-esr-students";
+const documentStorageKey = "erinnern-esr-student-documents";
 const profileStorageKey = "erinnern-esr-student-profiles";
+const studentSessionStorageKey = "erinnern-esr-active-student";
+const studentSessionDataStorageKey = "erinnern-esr-active-student-data";
+const studentSessionTokenStorageKey = "erinnern-esr-session-token";
 const teacherStorageKey = "erinnern-esr-teacher";
+const teacherAccountsStorageKey = "erinnern-esr-teacher-accounts";
 const teacherSessionKey = "erinnern-esr-teacher-active";
+const teacherAdminSessionKey = "erinnern-esr-teacher-admin-active";
+const teacherAdminName = "SON";
+const teacherAdminPasswordConfigured = false;
+const paymentStorageKey = "erinnern-esr-payments";
+const paymentTargetAmount = 250;
 const officialParticipantsStorageKey = "erinnern-esr-official-participants-jg9";
 const officialParticipantsVersionKey = "erinnern-esr-official-participants-version";
 const officialParticipantsVersion = "2";
@@ -12,6 +22,8 @@ const teacherSetupCard = document.querySelector("#teacherSetupCard");
 const teacherLoginCard = document.querySelector("#teacherLoginCard");
 const teacherSetupForm = document.querySelector("#teacherSetupForm");
 const teacherLoginForm = document.querySelector("#teacherLoginForm");
+const teacherAdminCard = document.querySelector("#teacherAdminCard");
+const teacherAdminForm = document.querySelector("#teacherAdminForm");
 const teacherStatus = document.querySelector("#teacherStatus");
 const teacherInternalPanel = document.querySelector("#uebersicht");
 const teacherStudentList = document.querySelector("#teacherStudentList");
@@ -114,12 +126,63 @@ function readStudents() {
   return readJson(studentStorageKey, []);
 }
 
+function writeStudents(students) {
+  writeJson(studentStorageKey, students);
+}
+
+function writeSignups(signups) {
+  writeJson(signupStorageKey, signups);
+}
+
 function readProfiles() {
   return readJson(profileStorageKey, {});
 }
 
 function writeProfiles(profiles) {
   writeJson(profileStorageKey, profiles);
+}
+
+function readDocuments() {
+  return readJson(documentStorageKey, {});
+}
+
+function writeDocuments(documents) {
+  writeJson(documentStorageKey, documents);
+}
+
+function readPayments() {
+  return readJson(paymentStorageKey, {});
+}
+
+function writePayments(payments) {
+  writeJson(paymentStorageKey, payments);
+}
+
+function normalizePaymentAmount(value) {
+  const amount = Number.parseFloat(String(value || "0").replace(",", "."));
+  if (!Number.isFinite(amount) || amount < 0) return 0;
+  return Math.min(paymentTargetAmount, Math.round(amount * 100) / 100);
+}
+
+function formatEuro(value) {
+  return `${normalizePaymentAmount(value).toLocaleString("de-DE", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  })} EUR`;
+}
+
+function normalizeGender(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["männlich", "maennlich", "m", "junge"].includes(normalized)) return "männlich";
+  if (["weiblich", "w", "mädchen", "maedchen"].includes(normalized)) return "weiblich";
+  return "";
+}
+
+function studentPaymentKey(student) {
+  return participantKey({
+    className: student.className || "",
+    name: student.name || student.email || ""
+  });
 }
 
 function readOfficialParticipants() {
@@ -144,6 +207,43 @@ function readOfficialParticipants() {
 
 function writeOfficialParticipants(participants) {
   writeJson(officialParticipantsStorageKey, participants);
+}
+
+function normalizeTeacherId(name) {
+  return String(name || "").trim().toLowerCase();
+}
+
+function createTeacherAccount(name, pin, status = "pending") {
+  const trimmedName = String(name || "").trim();
+  return {
+    id: normalizeTeacherId(trimmedName),
+    name: trimmedName,
+    pin: String(pin || ""),
+    status,
+    requestedAt: new Date().toISOString()
+  };
+}
+
+function readTeacherAccounts() {
+  const accounts = readJson(teacherAccountsStorageKey, []);
+
+  if (accounts.length) return accounts;
+
+  const legacyTeacher = readJson(teacherStorageKey, null);
+  if (!legacyTeacher?.name || !legacyTeacher?.pin) return [];
+
+  const migrated = [createTeacherAccount(legacyTeacher.name, legacyTeacher.pin, "approved")];
+  writeTeacherAccounts(migrated);
+  return migrated;
+}
+
+function writeTeacherAccounts(accounts) {
+  writeJson(teacherAccountsStorageKey, accounts);
+}
+
+function findTeacherAccount(name) {
+  const id = normalizeTeacherId(name);
+  return readTeacherAccounts().find(account => account.id === id);
 }
 
 function participantKey(participant) {
@@ -176,19 +276,39 @@ function sortParticipants(participants) {
 }
 
 function getTeacherAccount() {
-  return readJson(teacherStorageKey, null);
+  if (isTeacherAdminActive()) {
+    return { id: "admin-son", name: teacherAdminName, role: "admin", status: "approved" };
+  }
+
+  const activeTeacherId = localStorage.getItem(teacherSessionKey);
+  if (!activeTeacherId) return null;
+
+  return readTeacherAccounts().find(account => account.id === activeTeacherId && account.status === "approved") || null;
 }
 
-function setTeacherActive(active) {
-  if (active) {
-    localStorage.setItem(teacherSessionKey, "true");
+function setTeacherActive(account) {
+  if (account?.id) {
+    localStorage.setItem(teacherSessionKey, account.id);
   } else {
     localStorage.removeItem(teacherSessionKey);
   }
 }
 
 function isTeacherActive() {
-  return localStorage.getItem(teacherSessionKey) === "true";
+  return Boolean(getTeacherAccount());
+}
+
+function setTeacherAdminActive(active) {
+  if (active) {
+    localStorage.setItem(teacherAdminSessionKey, "true");
+    localStorage.removeItem(teacherSessionKey);
+  } else {
+    localStorage.removeItem(teacherAdminSessionKey);
+  }
+}
+
+function isTeacherAdminActive() {
+  return localStorage.getItem(teacherAdminSessionKey) === "true";
 }
 
 function escapeHtml(value) {
@@ -226,6 +346,55 @@ async function loadRemoteTeacherStudents() {
   writeProfiles(profiles);
 }
 
+async function resetRemoteStudentAccount(studentId) {
+  const teacher = getTeacherAccount();
+  if (!studentId || !teacher?.pin || isTeacherAdminActive()) return;
+
+  const response = await fetch(`/api/teacher/students/${encodeURIComponent(studentId)}`, {
+    method: "DELETE",
+    headers: { "X-Teacher-Pin": teacher.pin }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || "Schüleraccount konnte auf dem Server nicht zurückgesetzt werden.");
+  }
+}
+
+function resetLocalStudentAccount({ studentId, email, paymentKey }) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+
+  writeStudents(readStudents().filter(student => (
+    student.id !== studentId && String(student.email || "").trim().toLowerCase() !== normalizedEmail
+  )));
+
+  const profiles = readProfiles();
+  const documents = readDocuments();
+  if (studentId) {
+    delete profiles[studentId];
+    delete documents[studentId];
+  }
+  writeProfiles(profiles);
+  writeDocuments(documents);
+
+  const payments = readPayments();
+  if (paymentKey) delete payments[paymentKey];
+  writePayments(payments);
+
+  writeSignups(readSignups().filter(signup => (
+    signup.studentAccount !== studentId && String(signup.email || "").trim().toLowerCase() !== normalizedEmail
+  )));
+
+  if (localStorage.getItem(studentSessionStorageKey) === studentId) {
+    localStorage.removeItem(studentSessionStorageKey);
+    localStorage.removeItem(studentSessionDataStorageKey);
+    localStorage.removeItem(studentSessionTokenStorageKey);
+  }
+
+  remoteTeacherStudents = remoteTeacherStudents.filter(student => (
+    student.id !== studentId && String(student.email || "").trim().toLowerCase() !== normalizedEmail
+  ));
+}
+
 function collectTeacherStudents() {
   const byKey = new Map();
   const profiles = readProfiles();
@@ -233,15 +402,17 @@ function collectTeacherStudents() {
   readOfficialParticipants().forEach(participant => {
     if (participant.className === "Lehrkraft") return;
     byKey.set(participantKey(participant), {
+      studentId: "",
       name: participant.name,
       className: participant.className,
       email: "",
       guardian: "",
       phone: "",
-      trip: participant.className?.startsWith("9") ? "Straßburgfahrt 2026 - Jahrgang 9" : "Straßburgfahrt 2026 - Jahrgang 8",
+      trip: "Straßburgfahrt 2026",
       source: "Importierte TN-Liste",
       motivation: participant.motivation,
       consent: participant.consent,
+      gender: normalizeGender(participant.gender),
       profile: {}
     });
   });
@@ -252,15 +423,17 @@ function collectTeacherStudents() {
     const existing = byKey.get(key);
     const profile = profiles[student.id] || existing?.profile || {};
     byKey.set(key, {
+      studentId: student.id || "",
       name: student.name,
       className: student.className,
       email: student.email,
       guardian: profile.parent1Name || existing?.guardian || "",
       phone: profile.parent1Phone || existing?.phone || "",
-      trip: existing?.trip || "",
+      trip: student.trip || existing?.trip || "",
       source: existing ? `${existing.source} + Registriert` : "Registriert",
       motivation: existing?.motivation || "",
       consent: existing?.consent || "",
+      gender: existing?.gender || "",
       profile
     });
   });
@@ -273,17 +446,19 @@ function collectTeacherStudents() {
     const hasConsentImage = Boolean(student.documents?.consentImage);
     const hasSignature = Boolean(student.documents?.signature);
     byKey.set(key, {
+      studentId: student.id || existing?.studentId || "",
       name: student.name || existing?.name || "",
       className: student.className || existing?.className || "",
       email: student.email || existing?.email || "",
       guardian: profile.parent1Name || existing?.guardian || "",
       phone: profile.parent1Phone || existing?.phone || "",
-      trip: existing?.trip || "",
+      trip: student.trip || existing?.trip || "",
       source: existing ? `${existing.source} + Railway` : "Railway",
       motivation: existing?.motivation || "",
       consent: existing?.consent || hasConsentImage,
       uploadedConsent: hasConsentImage,
       signature: hasSignature,
+      gender: existing?.gender || "",
       profile
     });
   });
@@ -293,6 +468,7 @@ function collectTeacherStudents() {
     const key = byKey.has(signupKey) ? signupKey : (signup.email || signupKey);
     const existing = byKey.get(key);
     byKey.set(key, {
+      studentId: signup.studentAccount || existing?.studentId || "",
       name: signup.student || existing?.name || "",
       className: signup.className || existing?.className || "",
       email: signup.email || existing?.email || "",
@@ -302,6 +478,7 @@ function collectTeacherStudents() {
       source: existing ? `${existing.source} + Vormerkung` : "Vormerkung",
       motivation: existing?.motivation || "",
       consent: existing?.consent || "",
+      gender: existing?.gender || "",
       profile: signup.profile || existing?.profile || {}
     });
   });
@@ -315,6 +492,7 @@ function collectTeacherStudents() {
 
 function renderTeacherStudents() {
   const students = collectTeacherStudents();
+  const payments = readPayments();
 
   if (!students.length) {
     teacherStudentList.innerHTML = "<p class=\"empty\">Noch keine registrierten Schüler oder Vormerkungen gespeichert.</p>";
@@ -345,27 +523,64 @@ function renderTeacherStudents() {
             </tr>
           </thead>
           <tbody>
-            ${entries.map(student => `
-              <tr>
-                <td>${escapeHtml(student.name)}</td>
-                <td>${escapeHtml(student.email)}</td>
-                <td>${escapeHtml([student.guardian, student.phone].filter(Boolean).join(" | "))}</td>
-                <td>${escapeHtml([
-                  student.profile?.allergies ? `Allergien: ${student.profile.allergies}` : "",
-                  student.profile?.medication ? `Medizin: ${student.profile.medication}` : "",
-                  student.profile?.food ? `Ernährung: ${student.profile.food}` : "",
-                  student.profile?.supportNotes || ""
-                ].filter(Boolean).join(" | "))}</td>
-                <td>${escapeHtml(student.trip)}</td>
-                <td>${[
-                  student.motivation ? "Motivation" : "",
-                  student.consent ? "Einverständnis" : "",
-                  student.uploadedConsent ? "Upload" : "",
-                  student.signature ? "Unterschrift" : ""
-                ].filter(Boolean).join(" | ")}</td>
-                <td>${escapeHtml(student.source)}</td>
-              </tr>
-            `).join("")}
+            ${entries.map(student => {
+              const paymentKey = studentPaymentKey(student);
+              const paidAmount = normalizePaymentAmount(payments[paymentKey]);
+              const openAmount = Math.max(paymentTargetAmount - paidAmount, 0);
+              const progress = Math.min((paidAmount / paymentTargetAmount) * 100, 100);
+
+              return `
+                <tr>
+                  <td>
+                    <div class="student-name-payment">
+                      <strong>${escapeHtml(student.name)}</strong>
+                      ${student.gender ? `<small>${escapeHtml(student.gender)}</small>` : ""}
+                      <div class="payment-progress" aria-label="Zahlungsstand ${escapeHtml(student.name)}">
+                        <span style="width: ${progress}%"></span>
+                      </div>
+                      <div class="payment-summary">
+                        <span>${formatEuro(paidAmount)} gezahlt</span>
+                        <span>${formatEuro(openAmount)} offen</span>
+                      </div>
+                      <label class="payment-input">
+                        <span>Gezahlt</span>
+                        <input type="number" min="0" max="${paymentTargetAmount}" step="1" value="${paidAmount}" data-payment-key="${escapeHtml(paymentKey)}">
+                      </label>
+                    </div>
+                  </td>
+                  <td>${escapeHtml(student.email)}</td>
+                  <td>${escapeHtml([student.guardian, student.phone].filter(Boolean).join(" | "))}</td>
+                  <td>${escapeHtml([
+                    student.profile?.allergies ? `Allergien: ${student.profile.allergies}` : "",
+                    student.profile?.medication ? `Medizin: ${student.profile.medication}` : "",
+                    student.profile?.food ? `Ernährung: ${student.profile.food}` : "",
+                    student.profile?.supportNotes || ""
+                  ].filter(Boolean).join(" | "))}</td>
+                  <td>${escapeHtml(student.trip)}</td>
+                  <td>${[
+                    student.motivation ? "Motivation" : "",
+                    student.consent ? "Einverständnis" : "",
+                    student.uploadedConsent ? "Upload" : "",
+                    student.signature ? "Unterschrift" : ""
+                  ].filter(Boolean).join(" | ")}</td>
+                  <td>
+                    <div class="account-actions">
+                      <span>${escapeHtml(student.source)}</span>
+                      ${student.email || student.studentId ? `
+                        <button
+                          class="button compact danger-button"
+                          type="button"
+                          data-reset-student
+                          data-student-id="${escapeHtml(student.studentId)}"
+                          data-student-email="${escapeHtml(student.email)}"
+                          data-payment-key="${escapeHtml(paymentKey)}"
+                        >Account zurücksetzen</button>
+                      ` : ""}
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join("")}
           </tbody>
         </table>
       </div>
@@ -380,6 +595,7 @@ function renderOfficialParticipants() {
     <tr>
       <td>${escapeHtml(participant.className)}</td>
       <td>${escapeHtml(participant.name)}</td>
+      <td>${escapeHtml(normalizeGender(participant.gender))}</td>
       <td>${participant.motivation ? "x" : ""}</td>
       <td>${participant.consent ? "x" : ""}</td>
       <td>
@@ -406,6 +622,7 @@ function startParticipantEdit(index) {
   participantEditIndex = index;
   participantForm.elements.className.value = participant.className;
   participantForm.elements.name.value = participant.name;
+  participantForm.elements.gender.value = normalizeGender(participant.gender);
   participantForm.elements.motivation.checked = Boolean(participant.motivation);
   participantForm.elements.consent.checked = Boolean(participant.consent);
   participantSubmit.textContent = "Änderung speichern";
@@ -434,27 +651,56 @@ function renderSchedule() {
   `).join("");
 }
 
+function renderTeacherApprovalPanel() {
+  const accounts = readTeacherAccounts();
+  const pending = accounts.filter(account => account.status === "pending");
+  const approved = accounts.filter(account => account.status === "approved");
+
+  const pendingMarkup = pending.length
+    ? pending.map(account => `
+      <div class="approval-row">
+        <div>
+          <strong>${escapeHtml(account.name)}</strong>
+          <p>Wartet auf Freigabe.</p>
+        </div>
+        <div class="approval-actions">
+          <button class="button compact" type="button" data-teacher-approve="${escapeHtml(account.id)}">Freigeben</button>
+          <button class="button compact danger-button" type="button" data-teacher-reject="${escapeHtml(account.id)}">Ablehnen</button>
+        </div>
+      </div>
+    `).join("")
+    : "<p>Keine offenen Lehrer-Anträge.</p>";
+
+  const approvedMarkup = approved.length
+    ? approved.map(account => `<li>${escapeHtml(account.name)}</li>`).join("")
+    : "<li>Noch keine freigegebenen Lehrkräfte.</li>";
+
+  return `
+    <div class="teacher-approval-panel">
+      <h4>Lehrerzugänge freigeben</h4>
+      ${pendingMarkup}
+      <h4>Freigegebene Lehrkräfte</h4>
+      <ul>${approvedMarkup}</ul>
+    </div>
+  `;
+}
+
 function renderTeacher(message = "") {
   const teacher = getTeacherAccount();
-  const active = isTeacherActive() && teacher;
+  const active = Boolean(teacher);
+  const adminActive = isTeacherAdminActive();
+  const hasPendingAccounts = readTeacherAccounts().some(account => account.status === "pending");
 
-  teacherSetupCard.classList.toggle("hidden", Boolean(teacher));
-  teacherLoginCard.classList.toggle("hidden", !teacher || Boolean(active));
+  teacherSetupCard.classList.toggle("hidden", active);
+  teacherLoginCard.classList.toggle("hidden", active);
+  teacherAdminCard.classList.toggle("hidden", active);
   teacherInternalPanel.classList.toggle("hidden", !active);
-
-  if (!teacher) {
-    teacherStatus.innerHTML = `
-      <strong>Noch kein lokaler Lehrerzugang</strong>
-      <p>Richte auf diesem Gerät zuerst eine Lehrer-PIN ein. Danach kann die Verwaltung der Vormerkungen geöffnet werden.</p>
-      ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
-    `;
-    return;
-  }
 
   if (!active) {
     teacherStatus.innerHTML = `
-      <strong>Lehrerzugang geschlossen</strong>
-      <p>Die Vormerkungsliste und der CSV-Export sind erst nach Eingabe der Lehrer-PIN sichtbar.</p>
+      <strong>Lehrerzugang geschützt</strong>
+      <p>Neue Lehrerzugänge müssen zuerst durch Admin ${teacherAdminName} freigegeben werden.</p>
+      ${hasPendingAccounts ? "<p>Es gibt offene Lehrer-Anträge im Adminbereich.</p>" : ""}
       ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
     `;
     return;
@@ -463,19 +709,23 @@ function renderTeacher(message = "") {
   renderTeacherStudents();
   renderOfficialParticipants();
   renderSchedule();
-  loadRemoteTeacherStudents()
-    .then(() => {
-      renderTeacherStudents();
-      teacherStatus.querySelector(".remote-load-status")?.remove();
-    })
-    .catch(error => {
-      const status = teacherStatus.querySelector(".remote-load-status");
-      if (status) status.textContent = error.message;
-    });
+
+  if (!adminActive) {
+    loadRemoteTeacherStudents()
+      .then(() => {
+        renderTeacherStudents();
+        teacherStatus.querySelector(".remote-load-status")?.remove();
+      })
+      .catch(error => {
+        const status = teacherStatus.querySelector(".remote-load-status");
+        if (status) status.textContent = error.message;
+      });
+  }
+
   teacherStatus.innerHTML = `
-    <strong>Lehrerbereich geöffnet</strong>
+    <strong>${adminActive ? "Adminbereich geöffnet" : "Lehrerbereich geöffnet"}</strong>
     <p>${escapeHtml(teacher.name)} kann die gespeicherten Vormerkungen einsehen und exportieren.</p>
-    <p class="remote-load-status">Railway-Schülerdaten werden geladen …</p>
+    ${adminActive ? renderTeacherApprovalPanel() : "<p class=\"remote-load-status\">Railway-Schülerdaten werden geladen …</p>"}
     <a class="button primary" href="#uebersicht">Zur Übersicht</a>
     <button class="button compact" type="button" id="teacherLogoutButton">Lehrerbereich schließen</button>
     ${message ? `<p class="auth-message">${escapeHtml(message)}</p>` : ""}
@@ -485,41 +735,150 @@ function renderTeacher(message = "") {
 teacherSetupForm.addEventListener("submit", event => {
   event.preventDefault();
   const data = new FormData(teacherSetupForm);
-  const teacher = {
-    name: String(data.get("teacherName") || "").trim(),
-    pin: String(data.get("teacherPin") || "")
-  };
+  const name = String(data.get("teacherName") || "").trim();
+  const pin = String(data.get("teacherPin") || "");
+  const existing = findTeacherAccount(name);
 
-  writeJson(teacherStorageKey, teacher);
-  setTeacherActive(true);
+  if (existing?.status === "approved") {
+    renderTeacher("Für diese Lehrkraft ist bereits ein Zugang freigegeben.");
+    return;
+  }
+
+  if (existing?.status === "pending") {
+    renderTeacher("Dieser Lehrerzugang wartet bereits auf Admin-Freigabe.");
+    return;
+  }
+
+  const accounts = readTeacherAccounts().filter(account => account.id !== normalizeTeacherId(name));
+  accounts.push(createTeacherAccount(name, pin, "pending"));
+  writeTeacherAccounts(accounts);
   teacherSetupForm.reset();
-  renderTeacher("Lehrerzugang eingerichtet.");
+  renderTeacher("Lehrerzugang beantragt. Admin SON muss ihn zuerst freigeben.");
 });
 
 teacherLoginForm.addEventListener("submit", event => {
   event.preventDefault();
   const data = new FormData(teacherLoginForm);
-  const teacher = getTeacherAccount();
+  const name = String(data.get("teacherLoginName") || "").trim();
   const pin = String(data.get("teacherLoginPin") || "");
+  const teacher = findTeacherAccount(name);
 
   if (!teacher || teacher.pin !== pin) {
-    renderTeacher("Die Lehrer-PIN stimmt nicht.");
+    renderTeacher("Name oder Lehrer-PIN stimmt nicht.");
     return;
   }
 
-  setTeacherActive(true);
+  if (teacher.status !== "approved") {
+    renderTeacher("Dieser Lehrerzugang ist noch nicht durch Admin SON freigegeben.");
+    return;
+  }
+
+  setTeacherAdminActive(false);
+  setTeacherActive(teacher);
   teacherLoginForm.reset();
   renderTeacher("Lehrerbereich geöffnet.");
 });
 
+teacherAdminForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const data = new FormData(teacherAdminForm);
+  const adminName = String(data.get("adminName") || "").trim();
+
+  if (adminName !== teacherAdminName || !teacherAdminPasswordConfigured) {
+    renderTeacher("Admin-Freigaben brauchen ein geschütztes Backend. Ein Admin-Passwort darf nicht öffentlich in GitHub Pages stehen.");
+    return;
+  }
+
+  setTeacherAdminActive(true);
+  teacherAdminForm.reset();
+  renderTeacher("Adminbereich geöffnet.");
+});
+
 teacherStatus.addEventListener("click", event => {
-  const button = event.target.closest("#teacherLogoutButton");
-  if (!button) return;
-  setTeacherActive(false);
+  const approveButton = event.target.closest("[data-teacher-approve]");
+  const rejectButton = event.target.closest("[data-teacher-reject]");
+  const logoutButton = event.target.closest("#teacherLogoutButton");
+
+  if (approveButton && isTeacherAdminActive()) {
+    const id = approveButton.dataset.teacherApprove;
+    const accounts = readTeacherAccounts().map(account => (
+      account.id === id ? { ...account, status: "approved", approvedAt: new Date().toISOString() } : account
+    ));
+    writeTeacherAccounts(accounts);
+    renderTeacher("Lehrerzugang freigegeben.");
+    return;
+  }
+
+  if (rejectButton && isTeacherAdminActive()) {
+    const id = rejectButton.dataset.teacherReject;
+    const accounts = readTeacherAccounts().filter(account => account.id !== id);
+    writeTeacherAccounts(accounts);
+    renderTeacher("Lehrerzugang abgelehnt.");
+    return;
+  }
+
+  if (!logoutButton) return;
+  setTeacherActive(null);
+  setTeacherAdminActive(false);
   renderTeacher("Lehrerbereich geschlossen.");
 });
 
+teacherStudentList.addEventListener("input", event => {
+  const input = event.target.closest("[data-payment-key]");
+  if (!input) return;
+
+  const payments = readPayments();
+  const paidAmount = normalizePaymentAmount(input.value);
+  payments[input.dataset.paymentKey] = paidAmount;
+  writePayments(payments);
+
+  const paymentBlock = input.closest(".student-name-payment");
+  const progress = Math.min((paidAmount / paymentTargetAmount) * 100, 100);
+  const openAmount = Math.max(paymentTargetAmount - paidAmount, 0);
+  const progressBar = paymentBlock?.querySelector(".payment-progress span");
+  const summary = paymentBlock?.querySelector(".payment-summary");
+
+  if (progressBar) progressBar.style.width = `${progress}%`;
+  if (summary) {
+    summary.innerHTML = `
+      <span>${formatEuro(paidAmount)} gezahlt</span>
+      <span>${formatEuro(openAmount)} offen</span>
+    `;
+  }
+});
+
+teacherStudentList.addEventListener("click", async event => {
+  const button = event.target.closest("[data-reset-student]");
+  if (!button) return;
+
+  const studentId = button.dataset.studentId || "";
+  const email = button.dataset.studentEmail || "";
+  const paymentKey = button.dataset.paymentKey || "";
+  const confirmed = window.confirm("Diesen Schüleraccount wirklich zurücksetzen? Der Zugang, gespeicherte Angaben und Unterlagen werden gelöscht.");
+  if (!confirmed) return;
+
+  button.disabled = true;
+
+  try {
+    await resetRemoteStudentAccount(studentId);
+    resetLocalStudentAccount({ studentId, email, paymentKey });
+    renderTeacherStudents();
+    renderTeacher("Schüleraccount zurückgesetzt.");
+  } catch (error) {
+    resetLocalStudentAccount({ studentId, email, paymentKey });
+    renderTeacherStudents();
+    renderTeacher(`${error.message} Lokale Daten wurden zurückgesetzt.`);
+  }
+});
+
 refreshTeacherData.addEventListener("click", async () => {
+  if (isTeacherAdminActive()) {
+    renderTeacherStudents();
+    renderOfficialParticipants();
+    renderTeacher("Lokale Daten aktualisiert.");
+    return;
+  }
+
   try {
     await loadRemoteTeacherStudents();
     renderTeacherStudents();
@@ -547,6 +906,7 @@ participantForm.addEventListener("submit", event => {
   const participant = {
     className: String(data.get("className") || "").trim(),
     name: String(data.get("name") || "").trim(),
+    gender: normalizeGender(data.get("gender")),
     motivation: data.has("motivation"),
     consent: data.has("consent")
   };
@@ -581,27 +941,34 @@ officialParticipantsBody.addEventListener("click", event => {
 
 exportButton.addEventListener("click", () => {
   const students = collectTeacherStudents();
-  const headers = ["Name", "Klasse", "E-Mail", "Kontakt 1", "Telefon 1", "E-Mail Kontakt 1", "Kontakt 2", "Telefon 2", "E-Mail Kontakt 2", "Allergien", "Medikamente", "Ernaehrung", "Schwimmen", "Weitere Hinweise", "Fahrt", "Motivationsschreiben", "Einverstaendniserklaerung", "Status"];
-  const rows = students.map(entry => [
-    entry.name,
-    entry.className,
-    entry.email,
-    entry.profile?.parent1Name || entry.guardian,
-    entry.profile?.parent1Phone || entry.phone,
-    entry.profile?.parent1Email || "",
-    entry.profile?.parent2Name || "",
-    entry.profile?.parent2Phone || "",
-    entry.profile?.parent2Email || "",
-    entry.profile?.allergies || "",
-    entry.profile?.medication || "",
-    entry.profile?.food || "",
-    entry.profile?.swimming || "",
-    entry.profile?.supportNotes || "",
-    entry.trip,
-    entry.motivation ? "ja" : "",
-    entry.consent ? "ja" : "",
-    entry.source
-  ]);
+  const payments = readPayments();
+  const headers = ["Name", "Klasse", "Geschlecht", "Gezahlt", "Offen", "E-Mail", "Kontakt 1", "Telefon 1", "E-Mail Kontakt 1", "Kontakt 2", "Telefon 2", "E-Mail Kontakt 2", "Allergien", "Medikamente", "Ernaehrung", "Schwimmen", "Weitere Hinweise", "Fahrt", "Motivationsschreiben", "Einverstaendniserklaerung", "Status"];
+  const rows = students.map(entry => {
+    const paidAmount = normalizePaymentAmount(payments[studentPaymentKey(entry)]);
+    return [
+      entry.name,
+      entry.className,
+      entry.gender,
+      paidAmount,
+      Math.max(paymentTargetAmount - paidAmount, 0),
+      entry.email,
+      entry.profile?.parent1Name || entry.guardian,
+      entry.profile?.parent1Phone || entry.phone,
+      entry.profile?.parent1Email || "",
+      entry.profile?.parent2Name || "",
+      entry.profile?.parent2Phone || "",
+      entry.profile?.parent2Email || "",
+      entry.profile?.allergies || "",
+      entry.profile?.medication || "",
+      entry.profile?.food || "",
+      entry.profile?.swimming || "",
+      entry.profile?.supportNotes || "",
+      entry.trip,
+      entry.motivation ? "ja" : "",
+      entry.consent ? "ja" : "",
+      entry.source
+    ];
+  });
 
   const csv = [headers, ...rows].map(row => row.map(toCsvValue).join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });

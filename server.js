@@ -42,7 +42,8 @@ function publicStudent(row) {
     id: row.id,
     name: row.name,
     className: row.class_name || row.className,
-    email: row.email
+    email: row.email,
+    trip: row.trip || ""
   };
 }
 
@@ -82,6 +83,7 @@ async function initDb() {
       name text not null,
       class_name text not null,
       email text unique not null,
+      trip text default '',
       pin_hash text not null,
       created_at timestamptz default now()
     );
@@ -102,6 +104,7 @@ async function initDb() {
       created_at timestamptz default now()
     );
   `);
+  await pool.query("alter table students add column if not exists trip text default ''");
 }
 
 async function findStudentByEmail(email) {
@@ -140,9 +143,10 @@ app.post("/api/students/register", async (req, res) => {
   const name = String(req.body.name || "").trim();
   const className = String(req.body.className || "").trim();
   const email = String(req.body.email || "").trim().toLowerCase();
+  const trip = String(req.body.trip || "").trim();
   const pin = String(req.body.pin || "");
 
-  if (!name || !className || !email || pin.length < 4) {
+  if (!name || !className || !email || !trip || pin.length < 4) {
     res.status(400).json({ error: "Bitte alle Felder vollständig ausfüllen." });
     return;
   }
@@ -152,12 +156,12 @@ app.post("/api/students/register", async (req, res) => {
     return;
   }
 
-  const student = { id: crypto.randomUUID(), name, className, email, pin_hash: hashPin(pin) };
+  const student = { id: crypto.randomUUID(), name, className, email, trip, pin_hash: hashPin(pin) };
 
   if (pool) {
     await pool.query(
-      "insert into students (id, name, class_name, email, pin_hash) values ($1, $2, $3, $4, $5)",
-      [student.id, name, className, email, student.pin_hash]
+      "insert into students (id, name, class_name, email, trip, pin_hash) values ($1, $2, $3, $4, $5, $6)",
+      [student.id, name, className, email, trip, student.pin_hash]
     );
   } else {
     const store = readStore();
@@ -274,6 +278,7 @@ app.get("/api/teacher/students", async (req, res) => {
         s.name,
         s.class_name,
         s.email,
+        s.trip,
         coalesce(p.profile, '{}'::jsonb) as profile,
         coalesce(d.documents, '{}'::jsonb) as documents
       from students s
@@ -286,6 +291,7 @@ app.get("/api/teacher/students", async (req, res) => {
       name: row.name,
       className: row.class_name,
       email: row.email,
+      trip: row.trip || "",
       profile: row.profile,
       documents: row.documents
     })) });
@@ -299,10 +305,41 @@ app.get("/api/teacher/students", async (req, res) => {
       name: student.name,
       className: student.className,
       email: student.email,
+      trip: student.trip || "",
       profile: store.profiles[student.id] || {},
       documents: store.documents[student.id] || {}
     }))
   });
+});
+
+app.delete("/api/teacher/students/:id", async (req, res) => {
+  const teacherPin = process.env.TEACHER_PIN;
+  const providedPin = String(req.headers["x-teacher-pin"] || "");
+  const studentId = String(req.params.id || "");
+
+  if (!teacherPin) {
+    res.status(503).json({ error: "TEACHER_PIN ist auf Railway noch nicht gesetzt." });
+    return;
+  }
+
+  if (!providedPin || providedPin !== teacherPin) {
+    res.status(401).json({ error: "Lehrer-PIN stimmt nicht." });
+    return;
+  }
+
+  if (pool) {
+    await pool.query("delete from students where id = $1", [studentId]);
+    res.json({ ok: true });
+    return;
+  }
+
+  const store = readStore();
+  store.students = store.students.filter(student => student.id !== studentId);
+  delete store.profiles[studentId];
+  delete store.documents[studentId];
+  store.signups = store.signups.filter(signup => signup.student_id !== studentId);
+  writeStore(store);
+  res.json({ ok: true });
 });
 
 initDb()

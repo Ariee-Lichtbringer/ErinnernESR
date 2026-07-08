@@ -40,7 +40,22 @@
       <div class="section-heading">
         <p class="eyebrow">Schülerbereich</p>
         <h2>Anmelden oder Zugang anlegen</h2>
-        <p>Schülerinnen und Schüler können hier einen lokalen Zugang anlegen und anschließend ihre Vormerkung schneller ausfüllen.</p>
+        <p>Lege zuerst einen Zugang mit deiner Schul-E-Mail und einer persönlichen PIN an. Danach meldest du dich mit genau dieser E-Mail und PIN an.</p>
+      </div>
+
+      <div class="help-steps">
+        <article>
+          <span>1</span>
+          <p><strong>Neu registrieren:</strong> Name, Klasse, Schul-E-Mail und eine eigene PIN eintragen.</p>
+        </article>
+        <article>
+          <span>2</span>
+          <p><strong>Anmelden:</strong> Danach mit Schul-E-Mail und PIN einloggen.</p>
+        </article>
+        <article>
+          <span>3</span>
+          <p><strong>Unterlagen hochladen:</strong> Angaben ergänzen und den Rückläufer im Schüleraccount hochladen.</p>
+        </article>
       </div>
 
       <div class="auth-grid">
@@ -54,6 +69,14 @@
             <label>
               Klasse
               <input name="studentClass" placeholder="z. B. 8a" required>
+            </label>
+            <label>
+              Fahrt
+              <select name="studentTrip" required>
+                <option value="">Bitte wählen</option>
+                <option>Straßburgfahrt 2026</option>
+                <option>Auschwitzfahrt 2027</option>
+              </select>
             </label>
             <label>
               Schul-E-Mail
@@ -105,6 +128,10 @@
       <div class="download-list">
         <a href="assets/elternbriefe/elternbrief-strassburg-2026.pdf" download>
           <span>1. Elternbrief Straßburg</span>
+          <small>PDF herunterladen</small>
+        </a>
+        <a href="assets/elternbriefe/elternbrief-strassburg-2026-anzahlung.pdf" download>
+          <span>2. Elternbrief Erinnerung, Anzahlung und Rückläufer</span>
           <small>PDF herunterladen</small>
         </a>
       </div>
@@ -208,10 +235,8 @@
         <label>
           Fahrt
           <select name="trip">
-            <option>Straßburgfahrt 2026 - Jahrgang 8</option>
-            <option>Straßburgfahrt 2026 - Jahrgang 9</option>
-            <option>Vorbereitungstreffen</option>
-            <option>Interessenliste kommende Fahrt</option>
+            <option>Straßburgfahrt 2026</option>
+            <option>Auschwitzfahrt 2027</option>
           </select>
         </label>
         <label class="full">
@@ -270,9 +295,13 @@
 
   <footer>
     <p>Europaschule | Schülerzugang</p>
-    <a href="index.html">Zur Startseite</a>
+    <div class="footer-links">
+      <a href="datenschutz.html">Datenschutz</a>
+      <a href="index.html">Zur Startseite</a>
+    </div>
   </footer>
 
+  <script src="privacy.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
