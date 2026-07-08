@@ -139,6 +139,13 @@ function prefillSignup(student) {
   }
 }
 
+function showStudentArea(target = "angaben") {
+  const section = document.querySelector(`#${target}`);
+  if (!section) return;
+  window.location.hash = target;
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function renderAuth(message = "") {
   const activeStudent = getActiveStudent();
 
@@ -156,6 +163,8 @@ function renderAuth(message = "") {
   authStatus.innerHTML = `
     <strong>Angemeldet</strong>
     <p>${escapeHtml(activeStudent.name)}<br>${escapeHtml(activeStudent.className)} | ${escapeHtml(activeStudent.email)}</p>
+    <a class="button primary" href="#angaben">Meine Angaben</a>
+    <a class="button primary" href="#unterlagen">Unterlagen hochladen</a>
     <a class="button primary" href="intern.html">Interner Bereich</a>
     <a class="button primary" href="#anmeldung">Zur Vormerkung</a>
     <button class="button compact" type="button" id="logoutButton">Abmelden</button>
@@ -307,6 +316,7 @@ registerForm.addEventListener("submit", event => {
   setActiveStudent(student);
   registerForm.reset();
   renderAuth("Zugang angelegt. Du bist jetzt angemeldet.");
+  showStudentArea("angaben");
 });
 
 loginForm.addEventListener("submit", event => {
@@ -324,6 +334,7 @@ loginForm.addEventListener("submit", event => {
   setActiveStudent(student);
   loginForm.reset();
   renderAuth("Erfolgreich angemeldet.");
+  showStudentArea("angaben");
 });
 
 authStatus.addEventListener("click", event => {
