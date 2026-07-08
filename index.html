@@ -4,36 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gedenkstättenfahrten | Europaschule</title>
-  <meta name="description" content="Organisation der Gedenkstättenfahrten: Anmeldung, Ablauf, Zahlungen, Elternbriefe und Archiv.">
+  <meta name="description" content="Öffentliche Informationen zu den Gedenkstättenfahrten der Europaschule.">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="hero" id="start">
     <nav class="topbar" aria-label="Hauptnavigation">
-      <a class="brand" href="#start" aria-label="Startseite">
+      <a class="brand" href="index.html" aria-label="Startseite">
         <span class="brand-mark" aria-hidden="true">ES</span>
         <span>Erinnern ESR</span>
       </a>
       <div class="nav-links">
         <a href="#strassburg">Straßburg 2026</a>
-        <a href="#schuelerbereich">Schülerbereich</a>
-        <a href="#lehrerzugang">Lehrerzugang</a>
-        <a href="#anmeldung">Anmeldung</a>
         <a href="#ablauf">Ablauf</a>
         <a href="#zahlungen">Zahlungen</a>
         <a href="#downloads">Elternbriefe</a>
         <a href="#archiv">Archiv</a>
+        <a href="schueler.html">Schülerzugang</a>
+        <a href="lehrer.html">Lehrerzugang</a>
       </div>
     </nav>
 
     <div class="hero-content">
       <p class="eyebrow">Europaschule</p>
       <h1>Gedenkstättenfahrten</h1>
-      <p class="hero-copy">Informationen, Anmeldungen, Elternbriefe, Zahlungen und Rückblicke an einem Ort.</p>
+      <p class="hero-copy">Informationen, Termine, Elternbriefe, Zahlungen und Rückblicke an einem öffentlichen Ort.</p>
       <div class="hero-actions">
-        <a class="button primary" href="#schuelerbereich">Schüler-Login</a>
-        <a class="button secondary" href="#lehrerzugang">Lehrerzugang</a>
-        <a class="button secondary" href="#anmeldung">Anmeldung erfassen</a>
+        <a class="button primary" href="schueler.html">Schülerzugang</a>
+        <a class="button secondary" href="lehrer.html">Lehrerzugang</a>
         <a class="button secondary" href="#downloads">Elternbrief laden</a>
       </div>
     </div>
@@ -67,7 +65,7 @@
       <div class="feature-grid">
         <article>
           <h3>Anmeldungen</h3>
-          <p>Teilnahmewunsch, Kontaktdaten, Notfallnummer und Hinweise werden strukturiert erfasst.</p>
+          <p>Teilnahmewunsch, Kontaktdaten, Notfallnummer und Hinweise werden im Schülerzugang erfasst.</p>
         </article>
         <article>
           <h3>Ablauf</h3>
@@ -75,7 +73,7 @@
         </article>
         <article>
           <h3>Zahlungen</h3>
-          <p>Raten, Fristen und Zahlungsstatus können für die Fahrt übersichtlich koordiniert werden.</p>
+          <p>Öffentlich sichtbar bleibt nur der Eigenanteil. Interne Kosten liegen im Lehrerzugang.</p>
         </article>
         <article>
           <h3>Archiv</h3>
@@ -135,238 +133,6 @@
           <p>Nachtfahrt zurück nach Rheinberg, Ausgabe letzter Materialien und Hinweis auf das Nachbereitungsprojekt im Unterricht.</p>
         </article>
       </div>
-    </section>
-
-    <section class="section auth-section" id="schuelerbereich">
-      <div class="section-heading">
-        <p class="eyebrow">Schülerbereich</p>
-        <h2>Anmelden oder Zugang anlegen</h2>
-        <p>Schülerinnen und Schüler können hier einen lokalen Zugang anlegen und anschließend ihre Vormerkung schneller ausfüllen.</p>
-      </div>
-
-      <div class="auth-grid">
-        <article class="auth-card">
-          <h3>Neu registrieren</h3>
-          <form id="registerForm" class="auth-form">
-            <label>
-              Name
-              <input name="studentName" autocomplete="name" required>
-            </label>
-            <label>
-              Klasse
-              <input name="studentClass" placeholder="z. B. 8a" required>
-            </label>
-            <label>
-              Schul-E-Mail
-              <input type="email" name="studentEmail" autocomplete="email" required>
-            </label>
-            <label>
-              Persönliche PIN
-              <input type="password" name="studentPin" minlength="4" autocomplete="new-password" required>
-            </label>
-            <button class="button primary" type="submit">Zugang anlegen</button>
-          </form>
-        </article>
-
-        <article class="auth-card">
-          <h3>Anmelden</h3>
-          <form id="loginForm" class="auth-form">
-            <label>
-              Schul-E-Mail
-              <input type="email" name="loginEmail" autocomplete="email" required>
-            </label>
-            <label>
-              PIN
-              <input type="password" name="loginPin" autocomplete="current-password" required>
-            </label>
-            <button class="button primary" type="submit">Einloggen</button>
-          </form>
-        </article>
-
-        <aside class="auth-status" id="authStatus" aria-live="polite"></aside>
-      </div>
-
-      <div class="notice">
-        <strong>Datenschutz-Hinweis:</strong> Dieser Login ist für die statische Website vorbereitet und speichert Daten nur im jeweiligen Browser. Für echte Schülerkonten braucht die Schule ein geschütztes Backend.
-      </div>
-    </section>
-
-    <section class="section teacher-section" id="lehrerzugang">
-      <div class="section-heading">
-        <p class="eyebrow">Lehrerzugang</p>
-        <h2>Interne Verwaltung</h2>
-        <p>Lehrkräfte können hier einen lokalen Verwaltungszugang einrichten und anschließend Vormerkungen einsehen oder exportieren.</p>
-      </div>
-
-      <div class="teacher-grid">
-        <article class="teacher-card" id="teacherSetupCard">
-          <h3>Lehrer-PIN einrichten</h3>
-          <form id="teacherSetupForm" class="auth-form">
-            <label>
-              Name der Lehrkraft
-              <input name="teacherName" autocomplete="name" required>
-            </label>
-            <label>
-              Lehrer-PIN
-              <input type="password" name="teacherPin" minlength="4" autocomplete="new-password" required>
-            </label>
-            <button class="button primary" type="submit">Zugang einrichten</button>
-          </form>
-        </article>
-
-        <article class="teacher-card" id="teacherLoginCard">
-          <h3>Als Lehrkraft anmelden</h3>
-          <form id="teacherLoginForm" class="auth-form">
-            <label>
-              Lehrer-PIN
-              <input type="password" name="teacherLoginPin" autocomplete="current-password" required>
-            </label>
-            <button class="button primary" type="submit">Lehrerbereich öffnen</button>
-          </form>
-        </article>
-
-        <aside class="teacher-status" id="teacherStatus" aria-live="polite"></aside>
-      </div>
-
-      <div class="notice">
-        <strong>Hinweis:</strong> Auch dieser Lehrerzugang ist aktuell nur lokal im Browser geschützt. Für echte personenbezogene Verwaltungsdaten braucht die Schule ein geschütztes Backend.
-      </div>
-
-      <div class="teacher-internal hidden" id="teacherInternalPanel">
-        <article class="teacher-data-card">
-          <div class="panel-head">
-            <h3>Schülerliste nach Klassen</h3>
-            <button class="button compact" id="refreshTeacherData" type="button">Aktualisieren</button>
-          </div>
-          <div class="teacher-student-list" id="teacherStudentList"></div>
-        </article>
-
-        <article class="teacher-data-card">
-          <h3>Kontaktdaten der Veranstaltungen</h3>
-          <div class="teacher-table-wrap">
-            <table class="teacher-table">
-              <thead>
-                <tr>
-                  <th>Bereich</th>
-                  <th>Kontakt / Ort</th>
-                  <th>Hinweis</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Schulische Leitung</td>
-                  <td>Julia Sonnenwald</td>
-                  <td>Gesamtkoordination und Elternkommunikation</td>
-                </tr>
-                <tr>
-                  <td>Jahrgang 8</td>
-                  <td>Julia Sonnenwald, Martin Reichert</td>
-                  <td>Begleitung laut Ablaufplan Jahrgang 8</td>
-                </tr>
-                <tr>
-                  <td>Jahrgang 9</td>
-                  <td>Pia Westemeyer, Huran Tas</td>
-                  <td>Begleitung laut Ablaufplan Jahrgang 9</td>
-                </tr>
-                <tr>
-                  <td>Bus</td>
-                  <td>Frericks Reisen</td>
-                  <td>Rheinberg - Straßburg - Rheinberg</td>
-                </tr>
-                <tr>
-                  <td>Programm</td>
-                  <td>Natzweiler-Struthof, Europäisches Parlament, Musée Alsace</td>
-                  <td>Termine und Gruppen vor Fahrtbeginn intern bestätigen</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        <article class="teacher-data-card">
-          <h3>Interne Kostenübersicht</h3>
-          <div class="teacher-table-wrap">
-            <table class="teacher-table">
-              <thead>
-                <tr>
-                  <th>Posten</th>
-                  <th>Betrag</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>Hotel</td><td>9.124,00 EUR</td></tr>
-                <tr><td>Bus</td><td>4.199,16 EUR</td></tr>
-                <tr><td>Natzweiler Eintritt</td><td>395,00 EUR</td></tr>
-                <tr><td>Natzweiler Führungen</td><td>520,00 EUR</td></tr>
-                <tr><td>Museum Alsace Eintritt</td><td>500,00 EUR</td></tr>
-                <tr><td>Museum Alsace Führungen</td><td>500,00 EUR</td></tr>
-                <tr><td>Flammkuchenhaus</td><td>995,00 EUR</td></tr>
-                <tr class="sum-row"><td>Gesamtausgaben</td><td>16.233,16 EUR</td></tr>
-                <tr><td>Eigenanteile Schüler:innen</td><td>12.500,00 EUR</td></tr>
-                <tr><td>Förderung</td><td>4.000,00 EUR</td></tr>
-                <tr class="sum-row"><td>Überschuss laut Kalkulation</td><td>266,84 EUR</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="section split" id="anmeldung">
-      <div class="section-heading">
-        <p class="eyebrow">Anmeldung</p>
-        <h2>Teilnahme vormerken</h2>
-        <p>Diese erste Version speichert Eingaben lokal im Browser. Für echte Anmeldungen sollte später ein geschütztes Formular oder Schul-Backend angebunden werden.</p>
-      </div>
-
-      <form class="signup-form" id="signupForm">
-        <label>
-          Name der Schülerin / des Schülers
-          <input name="student" autocomplete="name" required>
-        </label>
-        <label>
-          Klasse / Jahrgang
-          <input name="className" placeholder="z. B. 10b" required>
-        </label>
-        <label>
-          Erziehungsberechtigte Person
-          <input name="guardian" autocomplete="name" required>
-        </label>
-        <label>
-          E-Mail
-          <input type="email" name="email" autocomplete="email" required>
-        </label>
-        <label>
-          Telefon für Rückfragen
-          <input name="phone" autocomplete="tel">
-        </label>
-        <label>
-          Fahrt
-          <select name="trip">
-            <option>Straßburgfahrt 2026 - Jahrgang 8</option>
-            <option>Straßburgfahrt 2026 - Jahrgang 9</option>
-            <option>Vorbereitungstreffen</option>
-            <option>Interessenliste kommende Fahrt</option>
-          </select>
-        </label>
-        <label class="full">
-          Hinweise zu Gesundheit, Verpflegung oder Unterstützungsbedarf
-          <textarea name="notes" rows="4"></textarea>
-        </label>
-        <label class="check full">
-          <input type="checkbox" name="consent" required>
-          <span>Ich habe zur Kenntnis genommen, dass dies eine Vormerkung ist und die verbindlichen Unterlagen über die Schule folgen.</span>
-        </label>
-        <button class="button primary" type="submit">Vormerkung speichern</button>
-      </form>
-
-      <aside class="admin-panel hidden" id="teacherPanel" aria-label="Gespeicherte Vormerkungen">
-        <div class="panel-head">
-          <h3>Vormerkungen</h3>
-          <button class="button compact" id="exportCsv" type="button">CSV exportieren</button>
-        </div>
-        <div class="signup-list" id="signupList"></div>
-      </aside>
     </section>
 
     <section class="section" id="ablauf">
@@ -489,7 +255,5 @@
     <p>Europaschule | Gedenkstättenfahrten</p>
     <a href="#start">Nach oben</a>
   </footer>
-
-  <script src="app.js"></script>
 </body>
 </html>

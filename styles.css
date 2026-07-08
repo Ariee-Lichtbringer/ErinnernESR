@@ -198,6 +198,10 @@ h3 {
   background: var(--paper);
 }
 
+.hidden {
+  display: none !important;
+}
+
 .status-band {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -583,6 +587,13 @@ textarea {
   gap: 12px;
   align-items: center;
   margin-bottom: 12px;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .signup-list {

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lehrerzugang | Erinnern ESR</title>
+  <meta name="description" content="Interne Übersicht für Lehrkräfte zur Straßburgfahrt 2026.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="internal-page">
+  <header class="internal-hero">
+    <nav class="topbar" aria-label="Lehrernavigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">ES</span>
+        <span>Erinnern ESR</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Startseite</a>
+        <a href="schueler.html">Schülerzugang</a>
+        <a href="#lehrerzugang">Login</a>
+        <a href="#uebersicht">Übersicht</a>
+      </div>
+    </nav>
+
+    <div class="internal-hero-content">
+      <p class="eyebrow">Lehrerzugang</p>
+      <h1>Interne Verwaltung</h1>
+      <p class="hero-copy">PIN-geschützte lokale Übersicht für Vormerkungen, Kontakte, Kosten und Export.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="section teacher-section" id="lehrerzugang">
+      <div class="section-heading">
+        <p class="eyebrow">Zugang</p>
+        <h2>Lehrerbereich öffnen</h2>
+        <p>Lehrkräfte können hier einen lokalen Verwaltungszugang einrichten und anschließend Vormerkungen einsehen oder exportieren.</p>
+      </div>
+
+      <div class="teacher-grid">
+        <article class="teacher-card" id="teacherSetupCard">
+          <h3>Lehrer-PIN einrichten</h3>
+          <form id="teacherSetupForm" class="auth-form">
+            <label>
+              Name der Lehrkraft
+              <input name="teacherName" autocomplete="name" required>
+            </label>
+            <label>
+              Lehrer-PIN
+              <input type="password" name="teacherPin" minlength="4" autocomplete="new-password" required>
+            </label>
+            <button class="button primary" type="submit">Zugang einrichten</button>
+          </form>
+        </article>
+
+        <article class="teacher-card" id="teacherLoginCard">
+          <h3>Als Lehrkraft anmelden</h3>
+          <form id="teacherLoginForm" class="auth-form">
+            <label>
+              Lehrer-PIN
+              <input type="password" name="teacherLoginPin" autocomplete="current-password" required>
+            </label>
+            <button class="button primary" type="submit">Lehrerbereich öffnen</button>
+          </form>
+        </article>
+
+        <aside class="teacher-status" id="teacherStatus" aria-live="polite"></aside>
+      </div>
+
+      <div class="notice">
+        <strong>Hinweis:</strong> Dieser Lehrerzugang ist aktuell nur lokal im Browser geschützt. Für echte personenbezogene Verwaltungsdaten braucht die Schule ein geschütztes Backend.
+      </div>
+    </section>
+
+    <section class="section teacher-internal hidden" id="uebersicht">
+      <article class="teacher-data-card">
+        <div class="panel-head">
+          <h3>Schülerliste nach Klassen</h3>
+          <div class="panel-actions">
+            <button class="button compact" id="refreshTeacherData" type="button">Aktualisieren</button>
+            <button class="button compact" id="exportCsv" type="button">CSV exportieren</button>
+          </div>
+        </div>
+        <div class="teacher-student-list" id="teacherStudentList"></div>
+      </article>
+
+      <article class="teacher-data-card">
+        <h3>Kontaktdaten der Veranstaltungen</h3>
+        <div class="teacher-table-wrap">
+          <table class="teacher-table">
+            <thead>
+              <tr>
+                <th>Bereich</th>
+                <th>Kontakt / Ort</th>
+                <th>Hinweis</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Schulische Leitung</td>
+                <td>Julia Sonnenwald</td>
+                <td>Gesamtkoordination und Elternkommunikation</td>
+              </tr>
+              <tr>
+                <td>Jahrgang 8</td>
+                <td>Julia Sonnenwald, Martin Reichert</td>
+                <td>Begleitung laut Ablaufplan Jahrgang 8</td>
+              </tr>
+              <tr>
+                <td>Jahrgang 9</td>
+                <td>Pia Westemeyer, Huran Tas</td>
+                <td>Begleitung laut Ablaufplan Jahrgang 9</td>
+              </tr>
+              <tr>
+                <td>Bus</td>
+                <td>Frericks Reisen</td>
+                <td>Rheinberg - Straßburg - Rheinberg</td>
+              </tr>
+              <tr>
+                <td>Programm</td>
+                <td>Natzweiler-Struthof, Europäisches Parlament, Musée Alsace</td>
+                <td>Termine und Gruppen vor Fahrtbeginn intern bestätigen</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="teacher-data-card">
+        <h3>Interne Kostenübersicht</h3>
+        <div class="teacher-table-wrap">
+          <table class="teacher-table">
+            <thead>
+              <tr>
+                <th>Posten</th>
+                <th>Betrag</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Hotel</td><td>9.124,00 EUR</td></tr>
+              <tr><td>Bus</td><td>4.199,16 EUR</td></tr>
+              <tr><td>Natzweiler Eintritt</td><td>395,00 EUR</td></tr>
+              <tr><td>Natzweiler Führungen</td><td>520,00 EUR</td></tr>
+              <tr><td>Museum Alsace Eintritt</td><td>500,00 EUR</td></tr>
+              <tr><td>Museum Alsace Führungen</td><td>500,00 EUR</td></tr>
+              <tr><td>Flammkuchenhaus</td><td>995,00 EUR</td></tr>
+              <tr class="sum-row"><td>Gesamtausgaben</td><td>16.233,16 EUR</td></tr>
+              <tr><td>Eigenanteile Schüler:innen</td><td>12.500,00 EUR</td></tr>
+              <tr><td>Förderung</td><td>4.000,00 EUR</td></tr>
+              <tr class="sum-row"><td>Überschuss laut Kalkulation</td><td>266,84 EUR</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>Europaschule | Lehrerzugang</p>
+    <a href="index.html">Zur Startseite</a>
+  </footer>
+
+  <script src="lehrer.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schülerzugang | Erinnern ESR</title>
+  <meta name="description" content="Schülerzugang für Anmeldung, Vormerkung und internen Bereich der Straßburgfahrt 2026.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="internal-page">
+  <header class="internal-hero">
+    <nav class="topbar" aria-label="Schülernavigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">ES</span>
+        <span>Erinnern ESR</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Startseite</a>
+        <a href="#schuelerbereich">Login</a>
+        <a href="#anmeldung">Vormerkung</a>
+        <a href="intern.html">Interner Bereich</a>
+      </div>
+    </nav>
+
+    <div class="internal-hero-content">
+      <p class="eyebrow">Schülerzugang</p>
+      <h1>Anmeldung und Vormerkung</h1>
+      <p class="hero-copy">Zugang anlegen, einloggen und die eigene Teilnahme für Straßburg 2026 vormerken.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="section auth-section" id="schuelerbereich">
+      <div class="section-heading">
+        <p class="eyebrow">Schülerbereich</p>
+        <h2>Anmelden oder Zugang anlegen</h2>
+        <p>Schülerinnen und Schüler können hier einen lokalen Zugang anlegen und anschließend ihre Vormerkung schneller ausfüllen.</p>
+      </div>
+
+      <div class="auth-grid">
+        <article class="auth-card">
+          <h3>Neu registrieren</h3>
+          <form id="registerForm" class="auth-form">
+            <label>
+              Name
+              <input name="studentName" autocomplete="name" required>
+            </label>
+            <label>
+              Klasse
+              <input name="studentClass" placeholder="z. B. 8a" required>
+            </label>
+            <label>
+              Schul-E-Mail
+              <input type="email" name="studentEmail" autocomplete="email" required>
+            </label>
+            <label>
+              Persönliche PIN
+              <input type="password" name="studentPin" minlength="4" autocomplete="new-password" required>
+            </label>
+            <button class="button primary" type="submit">Zugang anlegen</button>
+          </form>
+        </article>
+
+        <article class="auth-card">
+          <h3>Anmelden</h3>
+          <form id="loginForm" class="auth-form">
+            <label>
+              Schul-E-Mail
+              <input type="email" name="loginEmail" autocomplete="email" required>
+            </label>
+            <label>
+              PIN
+              <input type="password" name="loginPin" autocomplete="current-password" required>
+            </label>
+            <button class="button primary" type="submit">Einloggen</button>
+          </form>
+        </article>
+
+        <aside class="auth-status" id="authStatus" aria-live="polite"></aside>
+      </div>
+
+      <div class="notice">
+        <strong>Datenschutz-Hinweis:</strong> Dieser Login ist für die statische Website vorbereitet und speichert Daten nur im jeweiligen Browser. Für echte Schülerkonten braucht die Schule ein geschütztes Backend.
+      </div>
+    </section>
+
+    <section class="section split" id="anmeldung">
+      <div class="section-heading">
+        <p class="eyebrow">Anmeldung</p>
+        <h2>Teilnahme vormerken</h2>
+        <p>Diese erste Version speichert Eingaben lokal im Browser. Für echte Anmeldungen sollte später ein geschütztes Formular oder Schul-Backend angebunden werden.</p>
+      </div>
+
+      <form class="signup-form" id="signupForm">
+        <label>
+          Name der Schülerin / des Schülers
+          <input name="student" autocomplete="name" required>
+        </label>
+        <label>
+          Klasse / Jahrgang
+          <input name="className" placeholder="z. B. 8a" required>
+        </label>
+        <label>
+          Erziehungsberechtigte Person
+          <input name="guardian" autocomplete="name" required>
+        </label>
+        <label>
+          E-Mail
+          <input type="email" name="email" autocomplete="email" required>
+        </label>
+        <label>
+          Telefon für Rückfragen
+          <input name="phone" autocomplete="tel">
+        </label>
+        <label>
+          Fahrt
+          <select name="trip">
+            <option>Straßburgfahrt 2026 - Jahrgang 8</option>
+            <option>Straßburgfahrt 2026 - Jahrgang 9</option>
+            <option>Vorbereitungstreffen</option>
+            <option>Interessenliste kommende Fahrt</option>
+          </select>
+        </label>
+        <label class="full">
+          Hinweise zu Gesundheit, Verpflegung oder Unterstützungsbedarf
+          <textarea name="notes" rows="4"></textarea>
+        </label>
+        <label class="check full">
+          <input type="checkbox" name="consent" required>
+          <span>Ich habe zur Kenntnis genommen, dass dies eine Vormerkung ist und die verbindlichen Unterlagen über die Schule folgen.</span>
+        </label>
+        <button class="button primary" type="submit">Vormerkung speichern</button>
+      </form>
+
+      <aside class="admin-panel">
+        <h3>Nach dem Login</h3>
+        <p>Registrierte Schülerinnen und Schüler kommen von hier in den internen Bereich mit Aufgaben, Material und Reisejournal.</p>
+        <a class="button primary" href="intern.html">Interner Bereich</a>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <p>Europaschule | Schülerzugang</p>
+    <a href="index.html">Zur Startseite</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
