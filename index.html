@@ -17,6 +17,7 @@
       <div class="nav-links">
         <a href="#strassburg">Straßburg 2026</a>
         <a href="#schuelerbereich">Schülerbereich</a>
+        <a href="#lehrerzugang">Lehrerzugang</a>
         <a href="#anmeldung">Anmeldung</a>
         <a href="#ablauf">Ablauf</a>
         <a href="#zahlungen">Zahlungen</a>
@@ -31,6 +32,7 @@
       <p class="hero-copy">Informationen, Anmeldungen, Elternbriefe, Zahlungen und Rückblicke an einem Ort.</p>
       <div class="hero-actions">
         <a class="button primary" href="#schuelerbereich">Schüler-Login</a>
+        <a class="button secondary" href="#lehrerzugang">Lehrerzugang</a>
         <a class="button secondary" href="#anmeldung">Anmeldung erfassen</a>
         <a class="button secondary" href="#downloads">Elternbrief laden</a>
       </div>
@@ -189,6 +191,127 @@
       </div>
     </section>
 
+    <section class="section teacher-section" id="lehrerzugang">
+      <div class="section-heading">
+        <p class="eyebrow">Lehrerzugang</p>
+        <h2>Interne Verwaltung</h2>
+        <p>Lehrkräfte können hier einen lokalen Verwaltungszugang einrichten und anschließend Vormerkungen einsehen oder exportieren.</p>
+      </div>
+
+      <div class="teacher-grid">
+        <article class="teacher-card" id="teacherSetupCard">
+          <h3>Lehrer-PIN einrichten</h3>
+          <form id="teacherSetupForm" class="auth-form">
+            <label>
+              Name der Lehrkraft
+              <input name="teacherName" autocomplete="name" required>
+            </label>
+            <label>
+              Lehrer-PIN
+              <input type="password" name="teacherPin" minlength="4" autocomplete="new-password" required>
+            </label>
+            <button class="button primary" type="submit">Zugang einrichten</button>
+          </form>
+        </article>
+
+        <article class="teacher-card" id="teacherLoginCard">
+          <h3>Als Lehrkraft anmelden</h3>
+          <form id="teacherLoginForm" class="auth-form">
+            <label>
+              Lehrer-PIN
+              <input type="password" name="teacherLoginPin" autocomplete="current-password" required>
+            </label>
+            <button class="button primary" type="submit">Lehrerbereich öffnen</button>
+          </form>
+        </article>
+
+        <aside class="teacher-status" id="teacherStatus" aria-live="polite"></aside>
+      </div>
+
+      <div class="notice">
+        <strong>Hinweis:</strong> Auch dieser Lehrerzugang ist aktuell nur lokal im Browser geschützt. Für echte personenbezogene Verwaltungsdaten braucht die Schule ein geschütztes Backend.
+      </div>
+
+      <div class="teacher-internal hidden" id="teacherInternalPanel">
+        <article class="teacher-data-card">
+          <div class="panel-head">
+            <h3>Schülerliste nach Klassen</h3>
+            <button class="button compact" id="refreshTeacherData" type="button">Aktualisieren</button>
+          </div>
+          <div class="teacher-student-list" id="teacherStudentList"></div>
+        </article>
+
+        <article class="teacher-data-card">
+          <h3>Kontaktdaten der Veranstaltungen</h3>
+          <div class="teacher-table-wrap">
+            <table class="teacher-table">
+              <thead>
+                <tr>
+                  <th>Bereich</th>
+                  <th>Kontakt / Ort</th>
+                  <th>Hinweis</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Schulische Leitung</td>
+                  <td>Julia Sonnenwald</td>
+                  <td>Gesamtkoordination und Elternkommunikation</td>
+                </tr>
+                <tr>
+                  <td>Jahrgang 8</td>
+                  <td>Julia Sonnenwald, Martin Reichert</td>
+                  <td>Begleitung laut Ablaufplan Jahrgang 8</td>
+                </tr>
+                <tr>
+                  <td>Jahrgang 9</td>
+                  <td>Pia Westemeyer, Huran Tas</td>
+                  <td>Begleitung laut Ablaufplan Jahrgang 9</td>
+                </tr>
+                <tr>
+                  <td>Bus</td>
+                  <td>Frericks Reisen</td>
+                  <td>Rheinberg - Straßburg - Rheinberg</td>
+                </tr>
+                <tr>
+                  <td>Programm</td>
+                  <td>Natzweiler-Struthof, Europäisches Parlament, Musée Alsace</td>
+                  <td>Termine und Gruppen vor Fahrtbeginn intern bestätigen</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="teacher-data-card">
+          <h3>Interne Kostenübersicht</h3>
+          <div class="teacher-table-wrap">
+            <table class="teacher-table">
+              <thead>
+                <tr>
+                  <th>Posten</th>
+                  <th>Betrag</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Hotel</td><td>9.124,00 EUR</td></tr>
+                <tr><td>Bus</td><td>4.199,16 EUR</td></tr>
+                <tr><td>Natzweiler Eintritt</td><td>395,00 EUR</td></tr>
+                <tr><td>Natzweiler Führungen</td><td>520,00 EUR</td></tr>
+                <tr><td>Museum Alsace Eintritt</td><td>500,00 EUR</td></tr>
+                <tr><td>Museum Alsace Führungen</td><td>500,00 EUR</td></tr>
+                <tr><td>Flammkuchenhaus</td><td>995,00 EUR</td></tr>
+                <tr class="sum-row"><td>Gesamtausgaben</td><td>16.233,16 EUR</td></tr>
+                <tr><td>Eigenanteile Schüler:innen</td><td>12.500,00 EUR</td></tr>
+                <tr><td>Förderung</td><td>4.000,00 EUR</td></tr>
+                <tr class="sum-row"><td>Überschuss laut Kalkulation</td><td>266,84 EUR</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section class="section split" id="anmeldung">
       <div class="section-heading">
         <p class="eyebrow">Anmeldung</p>
@@ -237,7 +360,7 @@
         <button class="button primary" type="submit">Vormerkung speichern</button>
       </form>
 
-      <aside class="admin-panel" aria-label="Gespeicherte Vormerkungen">
+      <aside class="admin-panel hidden" id="teacherPanel" aria-label="Gespeicherte Vormerkungen">
         <div class="panel-head">
           <h3>Vormerkungen</h3>
           <button class="button compact" id="exportCsv" type="button">CSV exportieren</button>

@@ -7,6 +7,7 @@ Statische Website für die Koordination der Gedenkstättenfahrten an der Europas
 - Anmeldung/Vormerkung mit lokal gespeicherten Testdaten
 - CSV-Export der Vormerkungen
 - Schülerbereich mit lokaler Registrierung und Anmeldung
+- Lehrerzugang zur lokalen Verwaltung von Vormerkungen, Schülerlisten, Kontakten und interner Kostenübersicht
 - Interner Schülerbereich unter `intern.html`
 - Informationsbereich zur Straßburgfahrt 2026
 - Ablaufübersicht
