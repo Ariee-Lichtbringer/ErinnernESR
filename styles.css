@@ -83,14 +83,14 @@ a {
   font-weight: 800;
 }
 
-.brand-mark {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, .5);
-  background: rgba(255, 255, 255, .12);
-  font-size: 14px;
+.brand-logo {
+  display: block;
+  width: clamp(150px, 18vw, 230px);
+  height: auto;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 8px 24px rgba(10, 24, 36, .2);
 }
 
 .nav-links {
