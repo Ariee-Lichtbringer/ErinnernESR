@@ -38,5 +38,7 @@ Empfohlene Railway-Variablen:
 - `DATABASE_URL`: wird automatisch gesetzt, wenn eine Railway-Postgres-Datenbank verbunden ist.
 - `SESSION_SECRET`: zufälliger langer Geheimwert für Schüler-Sessions.
 - `TEACHER_PIN`: PIN, mit der die Lehrerseite serverseitige Schülerdaten abrufen darf.
+- `ADMIN_NAME`: Admin-Kürzel für den Lehrerbereich, standardmäßig `SON`.
+- `ADMIN_PASSWORD`: geheimes Admin-Passwort für den SON-Login; niemals im Repository speichern.
 
 Ohne `DATABASE_URL` speichert der Server lokal in `data/students.json`. Das ist nur für lokale Tests gedacht.

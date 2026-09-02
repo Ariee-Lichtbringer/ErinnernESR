@@ -13,6 +13,8 @@ try {
 const app = express();
 const port = process.env.PORT || 3000;
 const secret = process.env.SESSION_SECRET || "dev-secret-change-on-railway";
+const adminName = process.env.ADMIN_NAME || "SON";
+const adminPassword = process.env.ADMIN_PASSWORD || "";
 const dataFile = path.join(__dirname, "data", "students.json");
 const pool = process.env.DATABASE_URL && Pool
   ? new Pool({
@@ -62,6 +64,55 @@ function verifyToken(token) {
   if (!crypto.timingSafeEqual(Buffer.from(parts[2]), Buffer.from(expected))) return null;
   return parts[0];
 }
+
+function safeEqual(left, right) {
+  const leftBuffer = Buffer.from(String(left || ""));
+  const rightBuffer = Buffer.from(String(right || ""));
+  if (leftBuffer.length !== rightBuffer.length) return false;
+  return crypto.timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+function signAdminToken() {
+  const expiresAt = Date.now() + 8 * 60 * 60 * 1000;
+  const payload = `admin.${adminName}.${expiresAt}`;
+  const signature = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+  return `${payload}.${signature}`;
+}
+
+function verifyAdminToken(token) {
+  const parts = String(token || "").split(".");
+  if (parts.length !== 4 || parts[0] !== "admin" || parts[1] !== adminName) return false;
+  const expiresAt = Number(parts[2]);
+  if (!Number.isFinite(expiresAt) || expiresAt < Date.now()) return false;
+  const payload = parts.slice(0, 3).join(".");
+  const expected = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+  return safeEqual(parts[3], expected);
+}
+
+app.post("/api/admin/login", (req, res) => {
+  if (!adminPassword) {
+    res.status(503).json({ error: "ADMIN_PASSWORD ist auf Railway noch nicht gesetzt." });
+    return;
+  }
+
+  const name = String(req.body.name || "").trim();
+  const password = String(req.body.password || "");
+  if (!safeEqual(name, adminName) || !safeEqual(password, adminPassword)) {
+    res.status(401).json({ error: "Admin-Kürzel oder Passwort stimmt nicht." });
+    return;
+  }
+
+  res.json({ name: adminName, token: signAdminToken() });
+});
+
+app.get("/api/admin/session", (req, res) => {
+  const token = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+  if (!verifyAdminToken(token)) {
+    res.status(401).json({ error: "Admin-Sitzung ist abgelaufen." });
+    return;
+  }
+  res.json({ name: adminName, active: true });
+});
 
 function readStore() {
   if (!fs.existsSync(dataFile)) {

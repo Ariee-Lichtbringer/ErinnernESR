@@ -9,8 +9,8 @@ const teacherStorageKey = "erinnern-esr-teacher";
 const teacherAccountsStorageKey = "erinnern-esr-teacher-accounts";
 const teacherSessionKey = "erinnern-esr-teacher-active";
 const teacherAdminSessionKey = "erinnern-esr-teacher-admin-active";
+const teacherAdminTokenKey = "erinnern-esr-teacher-admin-token";
 const teacherAdminName = "SON";
-const teacherAdminPasswordConfigured = false;
 const paymentStorageKey = "erinnern-esr-payments";
 const paymentTargetAmount = 250;
 const officialParticipantsStorageKey = "erinnern-esr-official-participants-jg9";
@@ -298,17 +298,31 @@ function isTeacherActive() {
   return Boolean(getTeacherAccount());
 }
 
-function setTeacherAdminActive(active) {
-  if (active) {
+function setTeacherAdminActive(token) {
+  if (token) {
     localStorage.setItem(teacherAdminSessionKey, "true");
+    localStorage.setItem(teacherAdminTokenKey, token);
     localStorage.removeItem(teacherSessionKey);
   } else {
     localStorage.removeItem(teacherAdminSessionKey);
+    localStorage.removeItem(teacherAdminTokenKey);
   }
 }
 
 function isTeacherAdminActive() {
-  return localStorage.getItem(teacherAdminSessionKey) === "true";
+  return localStorage.getItem(teacherAdminSessionKey) === "true"
+    && Boolean(localStorage.getItem(teacherAdminTokenKey));
+}
+
+async function validateAdminSession() {
+  const token = localStorage.getItem(teacherAdminTokenKey);
+  if (!token) return false;
+  const response = await fetch("/api/admin/session", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (response.ok) return true;
+  setTeacherAdminActive(false);
+  return false;
 }
 
 function escapeHtml(value) {
@@ -779,19 +793,27 @@ teacherLoginForm.addEventListener("submit", event => {
   renderTeacher("Lehrerbereich geöffnet.");
 });
 
-teacherAdminForm.addEventListener("submit", event => {
+teacherAdminForm.addEventListener("submit", async event => {
   event.preventDefault();
   const data = new FormData(teacherAdminForm);
   const adminName = String(data.get("adminName") || "").trim();
+  const adminPassword = String(data.get("adminPassword") || "");
 
-  if (adminName !== teacherAdminName || !teacherAdminPasswordConfigured) {
-    renderTeacher("Admin-Freigaben brauchen ein geschütztes Backend. Ein Admin-Passwort darf nicht öffentlich in GitHub Pages stehen.");
-    return;
+  try {
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: adminName, password: adminPassword })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Admin-Anmeldung fehlgeschlagen.");
+    setTeacherAdminActive(result.token);
+    teacherAdminForm.reset();
+    renderTeacher("Adminbereich geöffnet.");
+  } catch (error) {
+    setTeacherAdminActive(false);
+    renderTeacher(error.message);
   }
-
-  setTeacherAdminActive(true);
-  teacherAdminForm.reset();
-  renderTeacher("Adminbereich geöffnet.");
 });
 
 teacherStatus.addEventListener("click", event => {
@@ -980,4 +1002,6 @@ exportButton.addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
-renderTeacher();
+validateAdminSession()
+  .catch(() => setTeacherAdminActive(false))
+  .finally(() => renderTeacher());
