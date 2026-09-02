@@ -24,6 +24,7 @@ const teacherSetupForm = document.querySelector("#teacherSetupForm");
 const teacherLoginForm = document.querySelector("#teacherLoginForm");
 const teacherAdminCard = document.querySelector("#teacherAdminCard");
 const teacherAdminForm = document.querySelector("#teacherAdminForm");
+const protectedScanDownload = document.querySelector("#protectedScanDownload");
 const teacherStatus = document.querySelector("#teacherStatus");
 const teacherInternalPanel = document.querySelector("#uebersicht");
 const teacherStudentList = document.querySelector("#teacherStudentList");
@@ -709,6 +710,7 @@ function renderTeacher(message = "") {
   teacherLoginCard.classList.toggle("hidden", active);
   teacherAdminCard.classList.toggle("hidden", active);
   teacherInternalPanel.classList.toggle("hidden", !active);
+  protectedScanDownload?.classList.toggle("hidden", !adminActive);
 
   if (!active) {
     teacherStatus.innerHTML = `
@@ -813,6 +815,34 @@ teacherAdminForm.addEventListener("submit", async event => {
   } catch (error) {
     setTeacherAdminActive(false);
     renderTeacher(error.message);
+  }
+});
+
+protectedScanDownload?.addEventListener("click", async event => {
+  event.preventDefault();
+  const token = localStorage.getItem(teacherAdminTokenKey);
+  if (!token) return;
+
+  protectedScanDownload.setAttribute("aria-disabled", "true");
+  try {
+    const response = await fetch("/api/admin/archive/scannen-11-2", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || "Download nicht möglich.");
+    }
+
+    const blobUrl = URL.createObjectURL(await response.blob());
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = "Schuelerschreiben-Sicherung-2026.pdf";
+    link.click();
+    URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    teacherStatus.innerHTML = `<strong>Download fehlgeschlagen</strong><p>${escapeHtml(error.message)}</p>`;
+  } finally {
+    protectedScanDownload.removeAttribute("aria-disabled");
   }
 });
 

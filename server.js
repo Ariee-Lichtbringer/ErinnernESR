@@ -16,6 +16,7 @@ const secret = process.env.SESSION_SECRET || "dev-secret-change-on-railway";
 const adminName = process.env.ADMIN_NAME || "SON";
 const adminPassword = process.env.ADMIN_PASSWORD || "";
 const dataFile = path.join(__dirname, "data", "students.json");
+const privateDocumentDir = process.env.PRIVATE_DOCUMENT_DIR || path.join(__dirname, "private-documents");
 const pool = process.env.DATABASE_URL && Pool
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
@@ -89,6 +90,15 @@ function verifyAdminToken(token) {
   return safeEqual(parts[3], expected);
 }
 
+function requireAdmin(req, res, next) {
+  const token = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+  if (!verifyAdminToken(token)) {
+    res.status(401).json({ error: "Admin-Sitzung ist abgelaufen." });
+    return;
+  }
+  next();
+}
+
 app.post("/api/admin/login", (req, res) => {
   if (!adminPassword) {
     res.status(503).json({ error: "ADMIN_PASSWORD ist auf Railway noch nicht gesetzt." });
@@ -113,6 +123,30 @@ app.get("/api/admin/session", (req, res) => {
   }
   res.json({ name: adminName, active: true });
 });
+
+app.get("/api/admin/archive/scannen-11-2", requireAdmin, (req, res) => {
+  const archiveFile = path.join(privateDocumentDir, "scannen-11-2.pdf");
+  if (!fs.existsSync(archiveFile)) {
+    res.status(404).json({ error: "Die digitale Sicherung wurde noch nicht hinterlegt." });
+    return;
+  }
+  res.download(archiveFile, "Schuelerschreiben-Sicherung-2026.pdf");
+});
+
+app.put(
+  "/api/admin/archive/scannen-11-2",
+  requireAdmin,
+  express.raw({ type: "application/pdf", limit: "30mb" }),
+  (req, res) => {
+    if (!Buffer.isBuffer(req.body) || req.body.length < 100 || !req.body.subarray(0, 4).equals(Buffer.from("%PDF"))) {
+      res.status(400).json({ error: "Bitte eine gültige PDF-Datei hochladen." });
+      return;
+    }
+    fs.mkdirSync(privateDocumentDir, { recursive: true });
+    fs.writeFileSync(path.join(privateDocumentDir, "scannen-11-2.pdf"), req.body);
+    res.json({ ok: true, bytes: req.body.length });
+  }
+);
 
 function readStore() {
   if (!fs.existsSync(dataFile)) {
